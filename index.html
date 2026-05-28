@@ -490,9 +490,6 @@ function buildAll() {
 function buildBotd() {
   const today = new Date().toDateString();
   const todayDets = allDetections.filter(d => new Date(d.dt).toDateString() === today);
-  const map = {};
-  todayDets.forEach(d => map[d.cn] = (map[d.cn]||{name:d.cn,sci:d.sn,count:0}), map[d.cn] && map[d.cn].count++);
-  // rebuild properly
   const map2 = {};
   todayDets.forEach(d => {
     if (!map2[d.cn]) map2[d.cn] = {name:d.cn,sci:d.sn,count:0};
