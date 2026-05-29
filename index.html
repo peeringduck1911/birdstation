@@ -598,10 +598,15 @@ function buildHourly(f){
   $('hourly-chart').innerHTML=hours.map((c,h)=>{
     const lbl=h===0?'12a':h<12?`${h}a`:h===12?'12p':`${h-12}p`;
     const pct=Math.round(c/max*85);
+    const tall=pct>22;
     return `<div class="tbar-col">
       <div class="tbar-tip">${lbl}: ${c}</div>
-      <div class="tbar-spacer"><div class="tbar" style="height:${pct}%;background:${colors[h%colors.length]}"></div></div>
-      <div class="tbar-val">${c>0?c:''}</div>
+      <div class="tbar-spacer" style="position:relative">
+        <div class="tbar" style="height:${pct}%;background:${colors[h%colors.length]};position:relative;min-height:${c>0?2:0}px">
+          ${c>0 && tall ? `<span style="position:absolute;top:3px;left:0;right:0;text-align:center;font-size:0.42rem;color:rgba(255,255,255,0.9);line-height:1">${c}</span>` : ''}
+        </div>
+        ${c>0 && !tall ? `<span style="position:absolute;bottom:${pct+1}%;left:0;right:0;text-align:center;font-size:0.42rem;color:rgba(26,26,20,0.5);line-height:1">${c}</span>` : ''}
+      </div>
       <div class="tbar-lbl">${lbl}</div>
     </div>`;
   }).join('');
@@ -662,8 +667,13 @@ function buildMySeasonalChart(cn){
   const cur=new Date().getMonth();
   $('my-seasonal').innerHTML=rate.map((v,m)=>{
     const h=Math.round(v/max*72);
+    const myLabel=v>0?v.toFixed(1):'';
+    const myTall=h>18;
     return `<div class="sbar-col${m===cur?' sbar-cur':''}">
-      <div class="sbar sbar-my" style="height:${h}px" title="${MONTHS[m]}: ${v.toFixed(1)}/day"></div>
+      <div class="sbar sbar-my" style="height:${Math.max(h,v>0?3:0)}px;position:relative" title="${MONTHS[m]}: ${v.toFixed(1)}/day">
+        ${myLabel && myTall ? `<span style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:0.38rem;color:rgba(255,255,255,0.85);line-height:1;overflow:hidden">${myLabel}</span>` : ''}
+      </div>
+      ${myLabel && !myTall ? `<div style="text-align:center;font-size:0.38rem;color:rgba(26,26,20,0.45);line-height:1.2">${myLabel}</div>` : '<div style="min-height:8px"></div>'}
       <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
@@ -680,8 +690,13 @@ function buildEbirdSeasonalChart(cn){
   const cur=new Date().getMonth();
   $('eb-seasonal').innerHTML=data.map((v,m)=>{
     const h=Math.round(v/max*72);
+    const ebLabel=v>0?Math.round(v)+'%':'';
+    const ebTall=h>18;
     return `<div class="sbar-col${m===cur?' sbar-cur':''}">
-      <div class="sbar sbar-eb" style="height:${h}px" title="${MONTHS[m]}: ${v}%"></div>
+      <div class="sbar sbar-eb" style="height:${Math.max(h,v>0?3:0)}px;position:relative" title="${MONTHS[m]}: ${v}%">
+        ${ebLabel && ebTall ? `<span style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:0.38rem;color:rgba(255,255,255,0.85);line-height:1;overflow:hidden">${ebLabel}</span>` : ''}
+      </div>
+      ${ebLabel && !ebTall ? `<div style="text-align:center;font-size:0.38rem;color:rgba(26,26,20,0.45);line-height:1.2">${ebLabel}</div>` : '<div style="min-height:8px"></div>'}
       <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
