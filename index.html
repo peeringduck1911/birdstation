@@ -149,6 +149,26 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);paddi
 .error-msg{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);padding:11px 15px;border-radius:4px;font-size:0.72rem;margin:14px 20px}
 .empty-msg{color:rgba(26,26,20,.35);font-size:.73rem;padding:22px 0;text-align:center}
 footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);letter-spacing:.06em}
+/* CALENDAR */
+.cal-overlay{position:fixed;inset:0;z-index:300;background:rgba(26,26,20,0.35);display:none;align-items:flex-end;justify-content:center}
+.cal-overlay.open{display:flex}
+.cal-box{background:var(--paper);border-radius:12px 12px 0 0;padding:20px;width:100%;max-width:480px;box-shadow:0 -4px 24px var(--shadow)}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--moss);font-weight:700}
+.cal-nav{background:none;border:1px solid rgba(26,26,20,0.2);border-radius:4px;width:28px;height:28px;cursor:pointer;font-size:0.8rem;color:var(--moss);display:flex;align-items:center;justify-content:center}
+.cal-close{background:none;border:none;font-size:0.7rem;color:rgba(26,26,20,0.4);cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:0.06em}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px}
+.cal-dow{text-align:center;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(26,26,20,0.35);padding:4px 0}
+.cal-day{text-align:center;padding:7px 2px;border-radius:6px;font-size:0.72rem;cursor:pointer;transition:background .12s;border:none;background:none;font-family:'DM Mono',monospace;color:var(--ink)}
+.cal-day:hover{background:var(--mist)}
+.cal-day.has-data{font-weight:500;color:var(--moss)}
+.cal-day.has-data::after{content:'·';display:block;font-size:0.6rem;color:var(--sage);margin-top:-2px;line-height:1}
+.cal-day.selected{background:var(--moss);color:white}
+.cal-day.selected::after{color:rgba(255,255,255,0.6)}
+.cal-day.today{border:1px solid var(--dawn)}
+.cal-day.empty{cursor:default}
+.cal-clear{width:100%;background:none;border:1px solid rgba(26,26,20,0.15);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:rgba(26,26,20,0.45);cursor:pointer;margin-top:4px}
+.cal-clear:hover{border-color:var(--rare);color:var(--rare)}
 </style>
 </head>
 <body>
@@ -190,6 +210,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <button class="chip" onclick="setTimeFilter('month',this)">Month</button>
       <button class="chip" onclick="setTimeFilter('year',this)">Year</button>
       <button class="chip" onclick="setTimeFilter('all',this)">All</button>
+      <button class="chip" id="cal-chip" onclick="openCal()">📅 Pick day</button>
     </div>
     <div class="filter-row" id="conf-row">
       <span class="filter-label">Conf:</span>
@@ -222,6 +243,23 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div class="chart-title">Top Species</div>
       <div class="hbar-chart" id="top-sp-chart"></div>
     </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="cal-overlay" id="cal-overlay" onclick="handleCalOverlayClick(event)">
+  <div class="cal-box" id="cal-box">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calNav(-1)">‹</button>
+      <div class="cal-title" id="cal-title"></div>
+      <button class="cal-nav" onclick="calNav(1)">›</button>
+      <button class="cal-close" onclick="closeCal()">Close</button>
+    </div>
+    <div class="cal-grid" id="cal-grid">
+      <div class="cal-dow">Su</div><div class="cal-dow">Mo</div><div class="cal-dow">Tu</div>
+      <div class="cal-dow">We</div><div class="cal-dow">Th</div><div class="cal-dow">Fr</div><div class="cal-dow">Sa</div>
+    </div>
+    <button class="cal-clear" onclick="clearCalFilter()">Clear date filter</button>
   </div>
 </div>
 
@@ -432,38 +470,43 @@ async function gql(query,vars={}){
 async function getAudioUrl(p){const d=await gql('query($p:String!){getAudioUrl(audioPath:$p)}',{p});return d.getAudioUrl}
 
 // INIT
+async function fetchAllDetections(){
+  allDetections=[];
+  nextToken=null;
+  let page=0;
+  while(true){
+    const q=nextToken
+      ?`query($nt:String){hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100,nextToken:$nt){items{id dt cn sn score wav}nextToken}}`
+      :`query{hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100){items{id dt cn sn score wav}nextToken}}`;
+    const data=await gql(q,nextToken?{nt:nextToken}:{});
+    const batch=data.hitBySerialByDate.items;
+    allDetections=[...allDetections,...batch];
+    nextToken=data.hitBySerialByDate.nextToken;
+    page++;
+    setStatus('','Loading… '+allDetections.length+' detections');
+    if(!nextToken||page>=20)break;
+  }
+}
+
 async function init(){
   clearError();
   $('loading').style.display='block';
   $('app').style.display='none';
   setStatus('','Connecting…');
-  // Load eBird and detections in parallel
   await Promise.all([
     loadEbirdCurrentMonth(),
-    gql(`query{hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100){items{id dt cn sn score wav}nextToken}}`).then(data=>{
-      allDetections=data.hitBySerialByDate.items;
-      nextToken=data.hitBySerialByDate.nextToken;
-    })
+    fetchAllDetections()
   ]).catch(e=>{throw e});
   $('loading').style.display='none';
   $('app').style.display='block';
   buildAll();
-  setStatus('live',`Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${allDetections.length} loaded`);
+  setStatus('live',`Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${allDetections.length} detections`);
   if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
   autoRefreshTimer=setTimeout(init,600000);
 }
 
 async function loadMore(){
-  if(!nextToken){$('more-btn').textContent='All caught up ✓';return}
-  $('more-btn').textContent='Loading…';$('more-btn').disabled=true;
-  try{
-    const data=await gql(`query($nt:String){hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100,nextToken:$nt){items{id dt cn sn score wav}nextToken}}`,{nt:nextToken});
-    allDetections=[...allDetections,...data.hitBySerialByDate.items];
-    nextToken=data.hitBySerialByDate.nextToken;
-    buildAll();
-  }catch(e){showError(e.message)}
-  $('more-btn').textContent=nextToken?'Load more':'All caught up ✓';
-  $('more-btn').disabled=false;
+  // No-op: all detections loaded on init
 }
 
 function buildAll(){
@@ -597,15 +640,12 @@ function buildHourly(f){
   const colors=['#3d5a3e','#4a6e4b','#577e58','#5b8fa8','#6a9e6e','#7a9e7e'];
   $('hourly-chart').innerHTML=hours.map((c,h)=>{
     const lbl=h===0?'12a':h<12?`${h}a`:h===12?'12p':`${h-12}p`;
-    const pct=Math.round(c/max*85);
-    const tall=pct>22;
+    const pct=Math.round(c/max*82);
     return `<div class="tbar-col">
       <div class="tbar-tip">${lbl}: ${c}</div>
-      <div class="tbar-spacer" style="position:relative">
-        <div class="tbar" style="height:${pct}%;background:${colors[h%colors.length]};position:relative;min-height:${c>0?2:0}px">
-          ${c>0 && tall ? `<span style="position:absolute;top:3px;left:0;right:0;text-align:center;font-size:0.42rem;color:rgba(255,255,255,0.9);line-height:1">${c}</span>` : ''}
-        </div>
-        ${c>0 && !tall ? `<span style="position:absolute;bottom:${pct+1}%;left:0;right:0;text-align:center;font-size:0.42rem;color:rgba(26,26,20,0.5);line-height:1">${c}</span>` : ''}
+      <div class="tbar-spacer" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%">
+        <div style="font-size:0.42rem;color:rgba(26,26,20,0.5);line-height:1.4;min-height:10px">${c>0?c:''}</div>
+        <div class="tbar" style="height:${pct}%;background:${colors[h%colors.length]};width:75%;min-height:${c>0?2:0}px"></div>
       </div>
       <div class="tbar-lbl">${lbl}</div>
     </div>`;
@@ -667,13 +707,9 @@ function buildMySeasonalChart(cn){
   const cur=new Date().getMonth();
   $('my-seasonal').innerHTML=rate.map((v,m)=>{
     const h=Math.round(v/max*72);
-    const myLabel=v>0?v.toFixed(1):'';
-    const myTall=h>18;
-    return `<div class="sbar-col${m===cur?' sbar-cur':''}">
-      <div class="sbar sbar-my" style="height:${Math.max(h,v>0?3:0)}px;position:relative" title="${MONTHS[m]}: ${v.toFixed(1)}/day">
-        ${myLabel && myTall ? `<span style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:0.38rem;color:rgba(255,255,255,0.85);line-height:1;overflow:hidden">${myLabel}</span>` : ''}
-      </div>
-      ${myLabel && !myTall ? `<div style="text-align:center;font-size:0.38rem;color:rgba(26,26,20,0.45);line-height:1.2">${myLabel}</div>` : '<div style="min-height:8px"></div>'}
+    return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
+      <div style="font-size:0.38rem;color:rgba(26,26,20,0.5);line-height:1.4;min-height:9px;text-align:center">${v>0?v.toFixed(1):''}</div>
+      <div class="sbar sbar-my" style="height:${Math.max(h,v>0?2:0)}px;width:100%" title="${MONTHS[m]}: ${v.toFixed(1)}/day"></div>
       <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
@@ -690,13 +726,9 @@ function buildEbirdSeasonalChart(cn){
   const cur=new Date().getMonth();
   $('eb-seasonal').innerHTML=data.map((v,m)=>{
     const h=Math.round(v/max*72);
-    const ebLabel=v>0?Math.round(v)+'%':'';
-    const ebTall=h>18;
-    return `<div class="sbar-col${m===cur?' sbar-cur':''}">
-      <div class="sbar sbar-eb" style="height:${Math.max(h,v>0?3:0)}px;position:relative" title="${MONTHS[m]}: ${v}%">
-        ${ebLabel && ebTall ? `<span style="position:absolute;top:2px;left:0;right:0;text-align:center;font-size:0.38rem;color:rgba(255,255,255,0.85);line-height:1;overflow:hidden">${ebLabel}</span>` : ''}
-      </div>
-      ${ebLabel && !ebTall ? `<div style="text-align:center;font-size:0.38rem;color:rgba(26,26,20,0.45);line-height:1.2">${ebLabel}</div>` : '<div style="min-height:8px"></div>'}
+    return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end">
+      <div style="font-size:0.38rem;color:rgba(26,26,20,0.5);line-height:1.4;min-height:9px;text-align:center">${v>0?Math.round(v)+'%':''}</div>
+      <div class="sbar sbar-eb" style="height:${Math.max(h,v>0?2:0)}px;width:100%" title="${MONTHS[m]}: ${v}%"></div>
       <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
@@ -752,6 +784,99 @@ function switchTab(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   $('tab-'+name).classList.add('active');btn.classList.add('active');
 }
+
+// ── CALENDAR ─────────────────────────────────────────────────────────
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let calSelectedDate=null; // 'YYYY-MM-DD' string or null
+
+function openCal(){
+  calYear=new Date().getFullYear();calMonth=new Date().getMonth();
+  renderCal();
+  $('cal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCal(){$('cal-overlay').classList.remove('open');document.body.style.overflow='';}
+function handleCalOverlayClick(e){if(e.target===$('cal-overlay'))closeCal();}
+function calNav(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++}
+  if(calMonth<0){calMonth=11;calYear--}
+  renderCal();
+}
+
+function renderCal(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  $('cal-title').textContent=months[calMonth]+' '+calYear;
+  const today=new Date();
+  const todayStr=today.toISOString().slice(0,10);
+  // Get days with detections this month
+  const daysWithData=new Set(
+    allDetections
+      .filter(d=>new Date(d.dt).getFullYear()===calYear&&new Date(d.dt).getMonth()===calMonth)
+      .map(d=>new Date(d.dt).toISOString().slice(0,10))
+  );
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  let html='';
+  // Empty cells for start of month
+  for(let i=0;i<firstDay;i++) html+='<button class="cal-day empty" disabled></button>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasData=daysWithData.has(dateStr);
+    const isToday=dateStr===todayStr;
+    const isSelected=dateStr===calSelectedDate;
+    html+=`<button class="cal-day${hasData?' has-data':''}${isToday?' today':''}${isSelected?' selected':''}" onclick="selectCalDay('${dateStr}')">${d}</button>`;
+  }
+  // Remove old day buttons, keep dow headers (first 7 children)
+  const grid=$('cal-grid');
+  while(grid.children.length>7) grid.removeChild(grid.lastChild);
+  grid.insertAdjacentHTML('beforeend', html);
+}
+
+function selectCalDay(dateStr){
+  calSelectedDate=dateStr;
+  timeFilter='day:'+dateStr;
+  // Update chip display
+  document.querySelectorAll('#time-row .chip').forEach(c=>c.classList.remove('active'));
+  const d=new Date(dateStr+'T12:00:00');
+  $('cal-chip').textContent='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
+  $('cal-chip').classList.add('active');
+  closeCal();
+  buildAll();
+}
+
+function clearCalFilter(){
+  calSelectedDate=null;
+  $('cal-chip').textContent='📅 Pick day';
+  closeCal();
+  // Revert to 24h
+  setTimeFilter('24h', $('time-row').querySelectorAll('.chip')[2]);
+}
+
+// Override cutoffFor to handle day filter
+const _origCutoff=cutoffFor;
+window.cutoffFor=function(f){
+  if(f&&f.startsWith('day:')){
+    const date=f.slice(4);
+    return null; // handled separately
+  }
+  return _origCutoff(f);
+};
+const _origFilterByTime=filterByTime;
+window.filterByTime=function(dets,f){
+  if(f&&f.startsWith('day:')){
+    const date=f.slice(4);
+    return dets.filter(d=>new Date(d.dt).toISOString().slice(0,10)===date);
+  }
+  return _origFilterByTime(dets,f);
+};
+window.labelFor=function(f){
+  if(f&&f.startsWith('day:')){
+    const d=new Date(f.slice(4)+'T12:00:00');
+    return d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+  }
+  return {'1h':'last hour','12h':'last 12h','24h':'last 24h','week':'this week','month':'this month','year':'this year','all':'all time'}[f]||f;
+};
 
 window.addEventListener('DOMContentLoaded',init);
 </script>
