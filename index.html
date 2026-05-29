@@ -286,12 +286,29 @@ footer { text-align:center; padding:24px; font-size:0.6rem; color:rgba(26,26,20,
 <footer>Pam &amp; Hugo Bird Station · BirdNET / Haikubox · eBird Nevada County, CA</footer>
 
 <script>
-// ── CREDENTIALS ───────────────────────────────────────────────────────
-const COGNITO    = 'https://cognito-idp.us-east-1.amazonaws.com/';
-const CLIENT_ID  = '5l07h6rq8oi69iu3q3pbkvcf7i';
-const DEVICE_KEY = 'us-east-1_115ec958-3349-40a7-af32-0ccae5420dad';
-const REFRESH    = 'eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.YVLUk6Usix9lnjjOZHAE0pZ2YC_DC1TnXoFGwvUkCAWrXhaRNLzphrOW5dOp9fECvCqk-23m0otRfwlUln1Yc3CR4g8uazpCoxuiV0nE6qGVv-qUvmKcFvBVfXY65LXoLaCNHo0OaFAaoxEoamr15eOSoDwx3q6xCLTb2qPQn4miVLEFWfLwTAHDif-eD0o3YKkh6cVdhrSTGpVEzKxi9AEh2a9kOSXqou540aKT-gfc8sRXyPn3TcdFrS2XPHMcEwpdFmXzx4lB-Qiyzmo-1bks4UhdsB9fxEwUOKDWSpnO14y7b1FhmehUazZ1T45TYWodywd8GBx4UQb_bSrJYQ.wWRTGkouzt7eQhjh.6SDxFFyAOsD0r6YjlHuSvUJkSG2ee0tF_z_VlCgqMBjDhSuxd3PhF_FV9wjTdydmpNKQxoBnJKiLpnHtSqI7DnRBW2M7rds8aZfkNzZmH8kgruJtPp9t_wQE5PrNXcM-UzvPo_hoXkY-iWqiimZ76t7eLy7sJDWyxE53zawIyjRLuLDquJAPF57e-fYrrKeTRsKUJnCXUsSM_EIWzOJO8JsXLerCoRDEZMz4BfCINgpJg67X9olNVMsTYT_D2uIJxWmYGG6FKsZkZlvvjmqZbqFXSm5V5J9UWIIH_3N1jYq1tJ1LY-aCNbTeLy2ozWb9-VS-XC3vqiuaIRNcsSEEjEV-5dqX2ggMNOUHN0U7ZOOw9gBTKrkCwx28qEVCKypOQTSZKoCYMS_SWbQApklxt24qzqvagHpkUd_mctS5g7Bwf_8xb8Wl0_PvTqmtlOqLaYM1rSZAd79xeQs4q3HPMpnuszUflBAjOcgGHn-s39T_Byv1BDirx30uCY2EXcPx3Li_qb0f6nlyxT7JDhxJti0V0PUDrI-PjuywU9f04gEDcWOymNdYC3TUwOUdRuTDBY37j_Jgvi6uR-qevObAMTSysqxIMBO_lOwohUw9NWlLxEffcaJ6enxx3ThpEDz2Y0wNIQORzSlpUmyVUE0kTyd6dvkKKQ6wE0qRsUcJZKLRhAYGjzNxa5jKwgjfu06ShjPV4aHYd2y7bB1HPJtdw4Oe1tojzn_Twh6wTijwvudpVoiC8VnTYVwY4YbIm-P7TrOQYcHhxHrlQimStYpXaj67GCsTD1ORxqNKnB_p3IRezFS2fbKm1lK2zqDSCwcb6J9-5zO0NSPhs8XKO37z3kL3nSUs9yg-oZzzr_hb_pik5qI0X_jciL365ipGnRYOAd-geXYznKhxvEvRFpBdIaRlJAve_F2W5En7ywFUOOAC2cP_Qcyz7stv-9X1Zvu4d1uSz7h98G_cP2SKatkpmTpTtY6LvwZmRrbSgFjQ6bgFENEdq57ZTCEO5onxfldDlIkaTiG8a9W_OAx2PDuENU5_nCqFo7D16zcg-JqJ-4KEj-rAIvD189GQz8oLSpWIpH7XR8xNxqlbjxEjNOSCklfLrmEIWyQXv8nVZOv2s1czUB6N90JfBvTX8UtsRBa3C4xZ1KgsAEZv2H6u-iFcTePunFtN4l0WVcXf47WdLALZatny3mJ6bBWskb5_Ex01S7f_fNxJtsao1nVPHCppLbspNRqmUJrpbC6oDWq6Hi3QDFZI0-wLFzAnjFCRSAZ9OnsyGoKtBkEsFeaFPwEsAEu3NiKlIIbput2wd5YKBzYainffDiBYYGqtmCWlvp_l_of_T1WmO7sRFKeziXtWWCWf413Ga9OFiliD6Qj4Cw5j_4zVfo_S5tGrqJMeE42PF8V9SlR4NIBJocZ6fNG8hxjy_BaVVFVLHvYO87_5.9mMvSQl78aU3qFXEgNiy5w';
-const APPSYNC   = 'https://x7bmgdtd7nbdpobdv2ytrrzsuy.appsync-api.us-east-1.amazonaws.com/graphql';
+// ── CONFIG ────────────────────────────────────────────────────────────
+const PROXY = 'https://bitter-sky-994d.chrisbiertuempfel.workers.dev';
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let allDetections = [], nextToken = null;
+let confFilter = 'all';
+let panelSpecies = null, panelDateFilter = 'today';
+let currentlyPlaying = null;
+let autoRefreshTimer = null;
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+function setStatus(type, msg) { $('sdot').className='sdot '+type; $('stxt').textContent=msg; }
+function showError(msg) { $('err').innerHTML=`<div class="error-msg">⚠️ ${msg}</div>`; }
+function clearError() { $('err').innerHTML=''; }
+function fmtTime(dt) { return new Date(dt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(dt) { return new Date(dt).toLocaleDateString([],{month:'short',day:'numeric'}); }
+function confCls(s) { return s>=0.85?'high':s>=0.65?'med':'low'; }
+function passesConfFilter(score) {
+  if (confFilter === 'high') return score >= 0.85;
+  if (confFilter === 'medhigh') return score >= 0.65;
+  return true;
+}
 const SERIAL    = 'Haikubox_3485188DDE1C';
 const MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -370,50 +387,11 @@ function isRare(cn) {
 function getEbirdData(cn) { return EBIRD[cn] || null; }
 
 // ── STATE ─────────────────────────────────────────────────────────────
-let accessToken = '', tokenExpiry = 0;
-let allDetections = [], nextToken = null;
-let confFilter = 'all';
-let panelSpecies = null, panelDateFilter = 'today';
-let currentlyPlaying = null;
-let autoRefreshTimer = null;
-
-// ── HELPERS ───────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-function setStatus(type, msg) { $('sdot').className='sdot '+type; $('stxt').textContent=msg; }
-function showError(msg) { $('err').innerHTML=`<div class="error-msg">⚠️ ${msg}</div>`; }
-function clearError() { $('err').innerHTML=''; }
-function fmtTime(dt) { return new Date(dt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function fmtDate(dt) { return new Date(dt).toLocaleDateString([],{month:'short',day:'numeric'}); }
-function fmtDateFull(dt) { return new Date(dt).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'}); }
-function confCls(s) { return s>=0.85?'high':s>=0.65?'med':'low'; }
-
-function passesConfFilter(score) {
-  if (confFilter === 'high') return score >= 0.85;
-  if (confFilter === 'medhigh') return score >= 0.65;
-  return true;
-}
-
-// ── AUTH ──────────────────────────────────────────────────────────────
-async function getToken() {
-  if (accessToken && Date.now() < tokenExpiry - 60000) return accessToken;
-  const res = await fetch(COGNITO, {
-    method:'POST',
-    headers:{'Content-Type':'application/x-amz-json-1.1','X-Amz-Target':'AWSCognitoIdentityProviderService.InitiateAuth'},
-    body: JSON.stringify({AuthFlow:'REFRESH_TOKEN_AUTH',ClientId:CLIENT_ID,AuthParameters:{REFRESH_TOKEN:REFRESH,DEVICE_KEY}})
-  });
-  const d = await res.json();
-  if (!d.AuthenticationResult) throw new Error('Auth failed');
-  accessToken = d.AuthenticationResult.AccessToken;
-  tokenExpiry = Date.now() + d.AuthenticationResult.ExpiresIn * 1000;
-  return accessToken;
-}
-
 async function gql(query, vars={}) {
-  const tok = await getToken();
-  const res = await fetch(APPSYNC, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':tok},
-    body: JSON.stringify({query, variables:vars})
+  const res = await fetch(PROXY, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({query, variables: vars})
   });
   const d = await res.json();
   if (d.errors) throw new Error(d.errors[0].message);
@@ -421,7 +399,7 @@ async function gql(query, vars={}) {
 }
 
 async function getAudioUrl(wavPath) {
-  const d = await gql('query($p:String!){getAudioUrl(audioPath:$p)}', {p:wavPath});
+  const d = await gql('query($p:String!){getAudioUrl(audioPath:$p)}', {p: wavPath});
   return d.getAudioUrl;
 }
 
