@@ -177,6 +177,12 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .cam-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
 .cam-time{font-size:0.62rem;color:rgba(26,26,20,0.4)}
 .cam-conf{font-size:0.58rem;background:rgba(76,175,119,.15);color:#2a7a4a;padding:2px 6px;border-radius:10px;font-weight:500}
+.review-actions{display:flex;gap:8px;margin-top:10px}
+.btn-approve{flex:1;padding:7px 0;background:#2d6a4f;color:#fff;border:none;border-radius:6px;font-size:0.68rem;letter-spacing:0.04em;cursor:pointer;transition:background .15s}
+.btn-approve:hover{background:#40916c}
+.btn-reject{flex:1;padding:7px 0;background:rgba(26,26,20,0.12);color:rgba(26,26,20,0.5);border:none;border-radius:6px;font-size:0.68rem;letter-spacing:0.04em;cursor:pointer;transition:background .15s}
+.btn-reject:hover{background:rgba(26,26,20,0.2)}
+.review-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--dawn);color:#fff;font-size:0.55rem;min-width:14px;height:14px;border-radius:7px;padding:0 3px;margin-left:3px;font-weight:600;vertical-align:middle}
 
 /* HOUR BOTTOM SHEET */
 .bottom-overlay{position:fixed;inset:0;background:rgba(26,26,20,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -319,6 +325,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <button class="tab-btn" onclick="switchTab('species',this)">Species</button>
     <button class="tab-btn" onclick="switchTab('feed',this)">Feed</button>
     <button class="tab-btn" onclick="switchTab('camera',this)">📷 Camera</button>
+    <button class="tab-btn" onclick="switchTab('review',this)">Review<span class="review-badge" id="review-badge" style="display:none"></span></button>
   </div>
 
   <div class="tab-pane active" id="tab-activity">
@@ -355,6 +362,11 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     </div>
     <div id="cam-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
     <div class="cam-grid" id="cam-feed"></div>
+  </div>
+
+  <div class="tab-pane" id="tab-review">
+    <div id="review-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
+    <div class="cam-grid" id="review-feed"></div>
   </div>
 </div>
 
@@ -1108,6 +1120,71 @@ async function loadCamera(){
   cameraLoaded=true;
 }
 
+// === REVIEW ===
+let reviewLoaded=false;
+async function loadReviewCount(){
+  try{
+    const res=await fetch(PROXY+'/review');
+    const data=await res.json();
+    const n=(data.pending||[]).length;
+    const badge=$('review-badge');
+    if(n>0){badge.textContent=n>9?'9+':n;badge.style.display='inline-flex';}
+    else badge.style.display='none';
+  }catch(e){}
+}
+async function loadReview(){
+  $('review-loading').style.display='block';$('review-feed').innerHTML='';
+  try{
+    const res=await fetch(PROXY+'/review');
+    const data=await res.json();
+    const pending=data.pending||[];
+    if(!pending.length){$('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';$('review-badge').style.display='none';$('review-loading').style.display='none';reviewLoaded=true;return;}
+    $('review-feed').innerHTML=pending.map(d=>{
+      const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+      const conf=Math.round((d.score||0)*100);
+      const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+      return `<div class="cam-card" id="rv-${d.id}">
+        <div class="cam-thumb">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+        <div class="cam-info">
+          <div class="cam-species">${d.common_name}</div>
+          <div class="cam-sci">${d.species||''}</div>
+          <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}</div>
+          <div class="review-actions">
+            <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm</button>
+            <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){$('review-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
+  $('review-loading').style.display='none';reviewLoaded=true;
+}
+function checkReviewEmpty(){
+  if(!$('review-feed').querySelectorAll('.cam-card').length){
+    $('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';
+    $('review-badge').style.display='none';
+  }
+}
+async function approveReview(id){
+  const card=$('rv-'+id);
+  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
+  try{
+    await fetch(PROXY+'/review/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    if(card)card.remove();
+    loadReviewCount();checkReviewEmpty();
+  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
+}
+async function rejectReview(id){
+  const card=$('rv-'+id);
+  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
+  try{
+    await fetch(PROXY+'/review/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    if(card)card.remove();
+    loadReviewCount();checkReviewEmpty();
+  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
+}
+
 // === FILTERS ===
 async function setTime(f,btn){
   timeFilter=f;calSelectedDate=null;
@@ -1142,6 +1219,7 @@ function switchTab(name,btn){
   if(name==='species')buildSpeciesList(f);
   if(name==='feed'){feedPage=0;buildFeed(f);}
   if(name==='camera'&&!cameraLoaded)loadCamera();
+  if(name==='review'&&!reviewLoaded)loadReview();
 }
 
 // === CALENDAR ===
@@ -1201,7 +1279,7 @@ async function init(){
   historyPromise=null;nextToken=null;allDetections=[];
   setStatus('','Connecting…');
   try{
-    await Promise.all([loadEbirdCurrentMonth(),fetchRecent()]);
+    await Promise.all([loadEbirdCurrentMonth(),fetchRecent(),loadReviewCount()]);
     $('loading').style.display='none';
     $('app').style.display='block';
     buildAll();
