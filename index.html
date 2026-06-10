@@ -93,7 +93,7 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);paddi
 .chart-title{font-size:0.63rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:12px}
 .timeline-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .timeline-chart{display:flex;align-items:flex-end;gap:2px;min-width:360px;padding:16px 0 22px;position:relative}
-.tbar-col{flex:1;min-width:18px;position:relative;height:110px}
+.tbar-col{flex:1;min-width:18px;position:relative;height:110px;display:flex;flex-direction:column;align-items:center}
 .tbar-col:hover .tbar-tip{opacity:1}
 .tbar-spacer{flex:1;width:100%;display:flex;align-items:flex-end}
 .tbar{width:75%;margin:0 auto;border-radius:2px 2px 0 0;transition:height .3s}
@@ -677,13 +677,11 @@ function buildHourly(f){
   const colors=['#3d5a3e','#4a6e4b','#577e58','#5b8fa8','#6a9e6e','#7a9e7e'];
   $('hourly-chart').innerHTML=hours.map((c,h)=>{
     const lbl=h===0?'12a':h<12?`${h}a`:h===12?'12p':`${h-12}p`;
-    const barPct=Math.round(c/max*72);
-    return `<div class="tbar-col" style="display:flex;flex-direction:column;align-items:center">
+    const barH=c>0?Math.max(2,Math.round(c/max*72)):0;
+    return `<div class="tbar-col">
       <div class="tbar-tip">${lbl}: ${c}</div>
-      <div style="font-size:0.42rem;color:rgba(26,26,20,0.5);height:12px;line-height:12px;text-align:center">${c>0?c:''}</div>
-      <div style="flex:1;display:flex;align-items:flex-end;width:100%">
-        <div class="tbar" style="height:${barPct}%;background:${colors[h%colors.length]};width:75%;margin:0 auto;min-height:${c>0?2:0}px;border-radius:2px 2px 0 0"></div>
-      </div>
+      <div class="tbar-val">${c>0?c:''}</div>
+      <div class="tbar-spacer"><div class="tbar" style="height:${barH}px;background:${colors[h%colors.length]}"></div></div>
       <div class="tbar-lbl">${lbl}</div>
     </div>`;
   }).join('');
