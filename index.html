@@ -187,6 +187,7 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .cam-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
 .cam-time{font-size:0.62rem;color:rgba(26,26,20,0.4)}
 .cam-conf{font-size:0.58rem;background:rgba(76,175,119,.15);color:#2a7a4a;padding:2px 6px;border-radius:10px;font-weight:500}
+.cam-flag{font-size:0.58rem;background:rgba(214,158,46,.18);color:#9a6a12;padding:2px 6px;border-radius:10px;font-weight:600}
 .review-actions{display:flex;gap:8px;margin-top:10px}
 .btn-approve{flex:1;padding:7px 0;background:#2d6a4f;color:#fff;border:none;border-radius:6px;font-size:0.68rem;letter-spacing:0.04em;cursor:pointer;transition:background .15s}
 .btn-approve:hover{background:#40916c}
@@ -1108,10 +1109,12 @@ function setPanelFilter(f,btn){
 
 // === LIGHTBOX ===
 const lbStore={};  // id -> detection (camera + review)
+function confFlag(d){return d.low_confidence?`<span class="cam-flag">${d.off_list?'⚠ uncommon here':'⚠ uncertain'}</span>`:'';}
 function lbImages(d){
+  // Wider context views first (most bird visible), tight crop last.
   const keys=[];
-  if(d.photo_key)keys.push(d.photo_key);
   (d.review_keys||[]).forEach(k=>{if(k&&!keys.includes(k))keys.push(k);});
+  if(d.photo_key&&!keys.includes(d.photo_key))keys.push(d.photo_key);
   return keys.map(k=>`${PROXY}/photo/${k}`);
 }
 function openLightbox(id){
@@ -1119,8 +1122,10 @@ function openLightbox(id){
   const imgs=lbImages(d);if(!imgs.length)return;
   const conf=Math.round((d.score||0)*100);
   const t=new Date(d.timestamp).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const scored=d.frames_scored>1?` · ${d.frames_scored} frames scored`:'';
+  const warn=d.low_confidence?(d.off_list?' · ⚠ uncommon here':' · ⚠ uncertain'):'';
   $('lb-title').textContent=d.common_name||d.species||'';
-  $('lb-sub').textContent=`${t}${conf>0?' · '+conf+'%':''}${imgs.length>1?' · '+imgs.length+' frames':''}`;
+  $('lb-sub').textContent=`${t}${conf>0?' · '+conf+'%':''}${scored}${warn}`;
   $('lb-main').src=imgs[0];
   $('lb-strip').innerHTML=imgs.length>1?imgs.map((u,i)=>`<img src="${u}" class="${i===0?'active':''}" onclick="lbSelect(${i})">`).join(''):'';
   $('lb-strip')._imgs=imgs;
@@ -1159,6 +1164,7 @@ async function loadCamera(){
           <div class="cam-meta">
             <span class="cam-time">${t} · ${dt}</span>
             ${conf>0?`<span class="cam-conf">${conf}%</span>`:''}
+            ${confFlag(d)}
           </div>
         </div>
       </div>`;
@@ -1199,7 +1205,7 @@ async function loadReview(){
         <div class="cam-info">
           <div class="cam-species">${d.common_name}</div>
           <div class="cam-sci">${d.species||''}</div>
-          <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}</div>
+          <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}${confFlag(d)}</div>
           <div class="review-actions">
             <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm</button>
             <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
