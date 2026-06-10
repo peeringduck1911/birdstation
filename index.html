@@ -171,6 +171,16 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .cam-card{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;box-shadow:0 1px 4px var(--shadow);overflow:hidden;display:flex}
 .cam-thumb{width:110px;min-height:90px;background:var(--mist);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden}
 .cam-thumb img{width:110px;height:90px;object-fit:cover}
+.cam-thumb.clickable{cursor:zoom-in}
+.lb-overlay{position:fixed;inset:0;z-index:400;background:rgba(10,10,8,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.lb-overlay.open{display:flex}
+.lb-close{position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;line-height:1}
+.lb-title{color:#fff;font-size:1rem;font-weight:600;margin-bottom:2px;text-align:center}
+.lb-sub{color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:10px;text-align:center}
+.lb-main{max-width:92vw;max-height:68vh;object-fit:contain;border-radius:8px;background:#000}
+.lb-strip{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+.lb-strip img{width:84px;height:64px;object-fit:cover;border-radius:6px;cursor:pointer;opacity:0.55;border:2px solid transparent;transition:opacity .15s,border-color .15s}
+.lb-strip img.active{opacity:1;border-color:#fff}
 .cam-info{padding:12px;flex:1;min-width:0}
 .cam-species{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--moss)}
 .cam-sci{font-size:0.6rem;color:rgba(26,26,20,0.35);font-style:italic;margin-top:2px}
@@ -430,6 +440,14 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     </div>
     <button class="cal-clear" onclick="clearCal()">Clear date filter</button>
   </div>
+</div>
+
+<div class="lb-overlay" id="lb-overlay" onclick="if(event.target===this)closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">×</button>
+  <div class="lb-title" id="lb-title"></div>
+  <div class="lb-sub" id="lb-sub"></div>
+  <img class="lb-main" id="lb-main" src="" alt="">
+  <div class="lb-strip" id="lb-strip"></div>
 </div>
 
 <footer>Pam &amp; Hugo Bird Station · BirdNET / Haikubox · eBird Nevada County CA</footer>
@@ -1088,6 +1106,34 @@ function setPanelFilter(f,btn){
   btn.classList.add('active');buildPanelHist();
 }
 
+// === LIGHTBOX ===
+const lbStore={};  // id -> detection (camera + review)
+function lbImages(d){
+  const keys=[];
+  if(d.photo_key)keys.push(d.photo_key);
+  (d.review_keys||[]).forEach(k=>{if(k&&!keys.includes(k))keys.push(k);});
+  return keys.map(k=>`${PROXY}/photo/${k}`);
+}
+function openLightbox(id){
+  const d=lbStore[id];if(!d)return;
+  const imgs=lbImages(d);if(!imgs.length)return;
+  const conf=Math.round((d.score||0)*100);
+  const t=new Date(d.timestamp).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  $('lb-title').textContent=d.common_name||d.species||'';
+  $('lb-sub').textContent=`${t}${conf>0?' · '+conf+'%':''}${imgs.length>1?' · '+imgs.length+' frames':''}`;
+  $('lb-main').src=imgs[0];
+  $('lb-strip').innerHTML=imgs.length>1?imgs.map((u,i)=>`<img src="${u}" class="${i===0?'active':''}" onclick="lbSelect(${i})">`).join(''):'';
+  $('lb-strip')._imgs=imgs;
+  $('lb-overlay').classList.add('open');
+}
+function lbSelect(i){
+  const imgs=$('lb-strip')._imgs||[];if(!imgs[i])return;
+  $('lb-main').src=imgs[i];
+  [...$('lb-strip').children].forEach((el,j)=>el.classList.toggle('active',i===j));
+}
+function closeLightbox(){$('lb-overlay').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+
 // === CAMERA ===
 async function loadCamera(){
   $('cam-loading').style.display='block';$('cam-feed').innerHTML='';
@@ -1098,13 +1144,15 @@ async function loadCamera(){
     $('cam-sp').textContent=new Set(dets.map(d=>d.common_name)).size;
     $('cam-ct').textContent=dets.length;
     if(!dets.length){$('cam-feed').innerHTML='<div class="empty-state">No camera detections today</div>';return;}
+    dets.forEach(d=>{lbStore[d.id]=d;});
     $('cam-feed').innerHTML=dets.map(d=>{
       const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
       const conf=Math.round((d.score||0)*100);
       const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+      const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
       return `<div class="cam-card">
-        <div class="cam-thumb">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+        <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
         <div class="cam-info">
           <div class="cam-species">${d.common_name}</div>
           <div class="cam-sci">${d.species||''}</div>
@@ -1139,13 +1187,15 @@ async function loadReview(){
     const data=await res.json();
     const pending=data.pending||[];
     if(!pending.length){$('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';$('review-badge').style.display='none';$('review-loading').style.display='none';reviewLoaded=true;return;}
+    pending.forEach(d=>{lbStore[d.id]=d;});
     $('review-feed').innerHTML=pending.map(d=>{
       const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
       const conf=Math.round((d.score||0)*100);
       const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+      const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
       return `<div class="cam-card" id="rv-${d.id}">
-        <div class="cam-thumb">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+        <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
         <div class="cam-info">
           <div class="cam-species">${d.common_name}</div>
           <div class="cam-sci">${d.species||''}</div>
