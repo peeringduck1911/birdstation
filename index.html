@@ -85,19 +85,19 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 
 /* HOURLY CHART */
 .hourly-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-/* SPECIES × HOUR GRID */
-.hourly-chart{display:block;padding:4px 0 0}
-.sph-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.sph-inner{min-width:460px;display:flex;flex-direction:column;gap:3px}
-.sph-row{display:flex;align-items:center;gap:2px}
-.sph-name{width:120px;flex-shrink:0;font-size:0.6rem;color:var(--ink);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px;line-height:1.3}
-.sph-name:hover{color:var(--moss)}
-.sph-hdr{width:13px;flex-shrink:0;font-size:0.38rem;color:rgba(26,26,20,.4);text-align:center;white-space:nowrap;overflow:visible;line-height:1}
-.sph-cell{width:13px;height:20px;border-radius:2px;flex-shrink:0;cursor:pointer;transition:opacity .1s}
-.sph-cell:hover{opacity:0.65;outline:1px solid rgba(26,26,20,0.35)}
-.sph-legend{font-size:0.52rem;color:rgba(26,26,20,0.38);margin-top:6px;padding-top:6px;border-top:1px solid rgba(26,26,20,0.07);display:flex;gap:10px}
-.sph-legend span{display:flex;align-items:center;gap:3px}
-.sph-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+/* HOURLY BAR CHART */
+.hourly-chart{display:block;padding:2px 0 0}
+.htb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.htb-wrap{display:flex;align-items:flex-end;gap:2px;min-width:420px;padding:36px 2px 0}
+.htb-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:14px;cursor:pointer;position:relative}
+.htb-col:hover .htb-bar{opacity:0.65}
+.htb-annotation{height:30px;display:flex;align-items:flex-end;justify-content:center;width:100%}
+.htb-tag{font-size:0.40rem;background:rgba(61,90,62,0.12);color:var(--moss);padding:2px 3px;border-radius:3px;white-space:nowrap;line-height:1.3;overflow:hidden;text-overflow:ellipsis;text-align:center;max-width:46px}
+.htb-count{font-size:0.42rem;color:rgba(26,26,20,0.45);height:10px;line-height:10px;text-align:center}
+.htb-spacer{display:flex;align-items:flex-end;width:100%}
+.htb-bar{width:80%;margin:0 auto;background:var(--moss);border-radius:2px 2px 0 0;transition:height .3s,opacity .15s}
+.htb-lbl{font-size:0.44rem;color:rgba(26,26,20,.4);white-space:nowrap;padding-top:3px;text-align:center;height:14px;line-height:14px}
+.htb-hint{font-size:0.5rem;color:rgba(26,26,20,0.28);text-align:right;padding-top:5px}
 /* RECENT COUNT BADGE */
 .recent-count{font-size:0.5rem;background:var(--moss);color:white;border-radius:10px;padding:1px 5px;font-weight:500;flex-shrink:0}
 /* FEED GROUPS */
@@ -198,28 +198,32 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .panel-sci{font-size:0.65rem;color:rgba(26,26,20,0.4);font-style:italic;margin-top:2px}
 .panel-links{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .ebird-link{font-size:0.62rem;color:var(--moss);text-decoration:none;border:1px solid rgba(61,90,62,0.3);border-radius:4px;padding:3px 8px;display:inline-flex;align-items:center;gap:4px}
-.panel-badges{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
-.panel-stat{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:5px;padding:5px 9px;font-size:0.62rem;color:rgba(26,26,20,0.55)}
-.panel-stat strong{color:var(--moss);font-size:0.85rem;font-family:'Playfair Display',serif;display:block}
+.panel-badges{margin-top:10px}
+.panel-stats-hero{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.panel-stat-lg{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;padding:10px 12px;box-shadow:0 1px 3px var(--shadow)}
+.panel-stat-lg .sv{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--moss);line-height:1}
+.panel-stat-lg .sl{font-size:0.52rem;color:rgba(26,26,20,0.42);margin-top:3px;letter-spacing:0.03em}
+.panel-stats-sm{display:flex;gap:5px;flex-wrap:wrap}
+.panel-stat-sm{background:rgba(61,90,62,0.06);border-radius:5px;padding:5px 9px;font-size:0.68rem;color:var(--moss);font-weight:500;line-height:1.2}
+.panel-stat-sm .sl{font-size:0.48rem;color:rgba(26,26,20,0.38);font-weight:400;display:block;margin-top:2px}
 .panel-rare-box{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);border-radius:5px;padding:8px 12px;font-size:0.66rem;line-height:1.5;margin-top:10px}
-.panel-section{padding:14px 20px 0}
-.panel-sec-title{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:8px}
-.panel-sec-sub{font-size:0.58rem;color:rgba(26,26,20,0.38);margin-bottom:8px}
+.panel-section{padding:16px 20px 0}
+.panel-sec-title{font-size:0.62rem;color:rgba(26,26,20,0.5);font-weight:500;margin-bottom:8px;letter-spacing:0.02em}
+.panel-sec-sub{font-size:0.55rem;color:rgba(26,26,20,0.35);margin-bottom:6px}
 
 /* PEAK HOUR MINI CHART */
-.peak-chart{display:flex;align-items:flex-end;gap:1px;height:44px}
+.peak-chart{display:flex;align-items:flex-end;gap:1px;height:54px}
 .peak-bar{flex:1;border-radius:1px 1px 0 0;min-height:1px;transition:height .3s}
 .peak-lbl{display:flex;justify-content:space-between;font-size:0.40rem;color:rgba(26,26,20,.32);margin-top:4px}
 
-/* SEASONAL */
-.seasonal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.seasonal-bars{display:flex;gap:3px;align-items:flex-end;min-width:280px;height:72px;margin-bottom:4px}
-.sbar-col{display:flex;flex-direction:column;align-items:center;flex:1}
-.sbar{border-radius:2px 2px 0 0;width:100%;min-height:0}
-.sbar-my{background:var(--moss)}.sbar-eb{background:rgba(91,143,168,0.6)}
-.sbar-cur .sbar-my{background:var(--dawn)}.sbar-cur .sbar-eb{background:rgba(200,151,90,0.7)}
-.sbar-lbl{font-size:0.44rem;color:rgba(26,26,20,.4);margin-top:3px;text-align:center}
-.sbar-cur .sbar-lbl{color:var(--dawn);font-weight:500}
+/* COMBINED SEASONAL CHART */
+.combo-chart{display:flex;gap:3px;align-items:flex-end;height:72px;margin-bottom:4px}
+.combo-month{flex:1;display:flex;gap:1px;align-items:flex-end}
+.combo-lbl-row{display:flex;gap:3px;margin-bottom:2px}
+.combo-lbl{flex:1;font-size:0.42rem;text-align:center}
+.combo-legend{display:flex;gap:12px;margin-top:6px;font-size:0.52rem;color:rgba(26,26,20,0.45)}
+.combo-legend span{display:flex;align-items:center;gap:4px}
+.combo-sw{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 
 /* PANEL HISTORY */
 .date-chip-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
@@ -379,18 +383,13 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <div id="panel-rare"></div>
   </div>
   <div class="panel-section">
-    <div class="panel-sec-title">Peak Activity — Hour of Day</div>
+    <div class="panel-sec-title">Peak activity by hour</div>
     <div class="peak-chart" id="panel-peak"></div>
     <div class="peak-lbl"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span></div>
   </div>
   <div class="panel-section">
-    <div class="panel-sec-title">Your Detections / Day (monthly avg)</div>
-    <div class="seasonal-wrap"><div class="seasonal-bars" id="my-seasonal"></div></div>
-  </div>
-  <div class="panel-section">
-    <div class="panel-sec-title">eBird Nevada County — % of Checklists</div>
-    <div class="panel-sec-sub" id="eb-sub">Loading…</div>
-    <div class="seasonal-wrap"><div class="seasonal-bars" id="eb-seasonal"></div></div>
+    <div class="panel-sec-title">Seasonal activity</div>
+    <div id="combo-seasonal"></div>
   </div>
   <div class="panel-section" style="padding-bottom:24px">
     <div class="panel-sec-title">Detection History</div>
@@ -710,52 +709,38 @@ function buildRecent(){
   }).join('');
 }
 
-// === HOURLY CHART — species × hour grid ===
-function sphColor(cnt,max){
-  if(!cnt)return '#ede8df';
-  const t=cnt/max;
-  if(t<0.25)return '#b3cfb5';
-  if(t<0.5)return '#7a9e7e';
-  if(t<0.75)return '#577e58';
-  return '#3d5a3e';
+// === HOURLY BAR CHART — annotated with top species ===
+function abbrevSp(name){
+  const p=name.split(' ');
+  return p.length>=2?p[0][0]+'. '+p[p.length-1]:name.slice(0,10);
 }
 function buildHourly(f){
   const el=$('hourly-chart');
-  if(!f.length){el.innerHTML='<div class="empty-state" style="width:100%">No data</div>';return;}
-  // Top 10 species by count
-  const totSp={};f.forEach(d=>totSp[d.cn]=(totSp[d.cn]||0)+1);
-  const topSp=Object.entries(totSp).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([n])=>n);
-  // Build sp × hour matrix
-  const matrix={};topSp.forEach(sp=>{matrix[sp]=Array(24).fill(0);});
-  f.forEach(d=>{if(matrix[d.cn]!==undefined)matrix[d.cn][new Date(d.dt).getHours()]++;});
-  // Hour header row (label select hours)
-  const LABEL_HRS=new Set([0,3,6,9,12,15,18,21]);
-  const hdrRow=`<div class="sph-row">
-    <div class="sph-name" style="font-size:0.48rem;color:rgba(26,26,20,0.35)">species ↓ · hour →</div>
-    ${Array(24).fill(0).map((_,h)=>`<div class="sph-hdr">${LABEL_HRS.has(h)?fmtHour(h):''}</div>`).join('')}
-  </div>`;
-  // Species rows
-  const rows=topSp.map(sp=>{
-    const rowMax=Math.max(1,...matrix[sp]);
-    const name=sp.length>17?sp.slice(0,16)+'…':sp;
-    return `<div class="sph-row">
-      <div class="sph-name" onclick="openSpecies('${sp.replace(/'/g,"\\'")}')">
-        ${name}<span style="color:rgba(26,26,20,0.3);font-size:0.52rem"> ${totSp[sp]}</span>
-      </div>
-      ${matrix[sp].map((cnt,h)=>`<div class="sph-cell"
-        style="background:${sphColor(cnt,rowMax)}"
-        title="${sp} · ${fmtHour(h)}: ${cnt}"
-        onclick="showHourDetail(${h})"></div>`).join('')}
-    </div>`;
-  }).join('');
-  const legend=`<div class="sph-legend">
-    <span><div class="sph-swatch" style="background:#ede8df"></div>none</span>
-    <span><div class="sph-swatch" style="background:#b3cfb5"></div>low</span>
-    <span><div class="sph-swatch" style="background:#7a9e7e"></div>mid</span>
-    <span><div class="sph-swatch" style="background:#3d5a3e"></div>high</span>
-    <span style="margin-left:auto;color:rgba(26,26,20,0.4)">tap cell for detail</span>
-  </div>`;
-  el.innerHTML=`<div class="sph-scroll"><div class="sph-inner">${hdrRow}${rows}</div>${legend}</div>`;
+  if(!f.length){el.innerHTML='<div class="empty-state">No data</div>';return;}
+  const hrs=Array(24).fill(0);
+  const hrSp=Array(24).fill(null).map(()=>({}));
+  f.forEach(d=>{
+    const h=new Date(d.dt).getHours();
+    hrs[h]++;
+    hrSp[h][d.cn]=(hrSp[h][d.cn]||0)+1;
+  });
+  const max=Math.max(1,...hrs);
+  const topPerHr=hrSp.map(sp=>Object.entries(sp).sort((a,b)=>b[1]-a[1]).map(([n])=>n));
+  // Annotate top 5 busiest hours
+  const annotate=new Set([...hrs.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).filter(([,c])=>c>0).map(([h])=>h));
+  const SHOW=new Set([0,6,9,12,15,18,21]);
+  el.innerHTML=`<div class="htb-scroll"><div class="htb-wrap">${
+    hrs.map((c,h)=>{
+      const barH=c>0?Math.max(3,Math.round(c/max*100)):0;
+      const tag=annotate.has(h)&&topPerHr[h][0]?`<span class="htb-tag">${abbrevSp(topPerHr[h][0])}</span>`:'';
+      return `<div class="htb-col" onclick="showHourDetail(${h})">
+        <div class="htb-annotation">${tag}</div>
+        <div class="htb-count">${c||''}</div>
+        <div class="htb-spacer"><div class="htb-bar" style="height:${barH}px"></div></div>
+        <div class="htb-lbl">${SHOW.has(h)?fmtHour(h):''}</div>
+      </div>`;
+    }).join('')
+  }</div><div class="htb-hint">tap a bar · species breakdown</div></div>`;
 }
 
 // === HOUR DETAIL PANEL ===
@@ -1010,11 +995,15 @@ async function openSpecies(cn){
   const hrs=Array(24).fill(0);dets.forEach(d=>hrs[new Date(d.dt).getHours()]++);
   const peakH=hrs.indexOf(Math.max(...hrs));
   $('panel-badges').innerHTML=`
-    <div class="panel-stat"><strong>${dets.length}</strong>total</div>
-    <div class="panel-stat"><strong>${perDay}</strong>per active day</div>
-    <div class="panel-stat"><strong>${fmtHour(peakH)}</strong>peak hour</div>
-    <div class="panel-stat"><strong>${Math.round(avg*100)}%</strong>avg conf</div>
-    <div class="panel-stat"><strong>${fmtDate(dets[dets.length-1].dt)}</strong>first seen</div>`;
+    <div class="panel-stats-hero">
+      <div class="panel-stat-lg"><div class="sv">${fmtHour(peakH)}</div><div class="sl">peak hour</div></div>
+      <div class="panel-stat-lg"><div class="sv">${perDay}</div><div class="sl">per active day</div></div>
+    </div>
+    <div class="panel-stats-sm">
+      <div class="panel-stat-sm">${dets.length}<span class="sl">total</span></div>
+      <div class="panel-stat-sm">${Math.round(avg*100)}%<span class="sl">avg conf</span></div>
+      <div class="panel-stat-sm">${fmtDate(dets[dets.length-1].dt)}<span class="sl">first seen</span></div>
+    </div>`;
   $('panel-rare').innerHTML=isRare(cn)?
     `<div class="panel-rare-box">⚠️ <strong>Rare for this time of year</strong> — not in recent eBird Nevada County checklists.</div>`:'';
   // Peak hour chart
@@ -1022,7 +1011,7 @@ async function openSpecies(cn){
   $('panel-peak').innerHTML=hrs.map((c,h)=>`
     <div class="peak-bar${h===peakH?' peak':''}" style="height:${Math.max(c>0?2:0,Math.round(c/maxH*40))}px;background:${h===peakH?'var(--moss)':'var(--sage)'};opacity:${c>0?0.85:0.15}"></div>`
   ).join('');
-  buildMySeasonalChart(cn);buildEbirdSeasonalChart(cn);buildPanelHist();
+  buildCombinedSeasonal(cn);buildPanelHist();
   $('panel-overlay').classList.add('open');
   $('sp-panel').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1033,37 +1022,35 @@ function closePanel(){
   document.body.style.overflow='';
 }
 
-function buildMySeasonalChart(cn){
+function buildCombinedSeasonal(cn){
   const counts=Array(12).fill(0),days=Array(12).fill(null).map(()=>new Set());
   allDetections.filter(d=>d.cn===cn).forEach(d=>{
     const m=new Date(d.dt).getMonth();counts[m]++;days[m].add(new Date(d.dt).toDateString());
   });
-  const rate=counts.map((c,m)=>days[m].size>0?c/days[m].size:0);
-  const max=Math.max(0.01,...rate);
+  const myRate=counts.map((c,m)=>days[m].size>0?c/days[m].size:0);
+  const ebData=EBIRD_FREQ[cn]||null;
+  const myMax=Math.max(0.01,...myRate);
+  const ebMax=ebData?Math.max(0.1,...ebData):1;
   const cur=new Date().getMonth();
-  $('my-seasonal').innerHTML=rate.map((v,m)=>{
-    const h=Math.max(v>0?2:0,Math.round(v/max*62));
-    return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center">
-      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center">${v>0?v.toFixed(1):''}</div>
-      <div style="flex:1;display:flex;align-items:flex-end;width:100%"><div class="sbar sbar-my" style="height:${h}px;width:100%"></div></div>
-      <div class="sbar-lbl">${MONTHS[m][0]}</div>
+  const el=$('combo-seasonal');
+  const bars=MONTHS.map((mo,m)=>{
+    const myH=Math.max(myRate[m]>0?2:0,Math.round(myRate[m]/myMax*64));
+    const ebH=ebData?Math.max(ebData[m]>0?2:0,Math.round(ebData[m]/ebMax*64)):0;
+    const isCur=m===cur;
+    const lblColor=isCur?'var(--dawn)':'rgba(26,26,20,0.35)';
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:64px">
+        <div style="flex:1;height:${myH}px;background:${isCur?'var(--dawn)':'var(--moss)'};border-radius:1px 1px 0 0"></div>
+        ${ebData?`<div style="flex:1;height:${ebH}px;background:${isCur?'rgba(200,151,90,0.55)':'rgba(91,143,168,0.5)'};border-radius:1px 1px 0 0"></div>`:''}
+      </div>
+      <div style="font-size:0.42rem;color:${lblColor};font-weight:${isCur?500:400};margin-top:3px">${mo[0]}</div>
     </div>`;
   }).join('');
-}
-
-function buildEbirdSeasonalChart(cn){
-  const data=EBIRD_FREQ[cn];
-  if(!data){$('eb-sub').textContent='No eBird data for this species';$('eb-seasonal').innerHTML='';return;}
-  $('eb-sub').textContent='% of eBird checklists reporting this species';
-  const max=Math.max(0.1,...data);const cur=new Date().getMonth();
-  $('eb-seasonal').innerHTML=data.map((v,m)=>{
-    const h=Math.max(v>0?2:0,Math.round(v/max*62));
-    return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center">
-      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center">${v>0?Math.round(v)+'%':''}</div>
-      <div style="flex:1;display:flex;align-items:flex-end;width:100%"><div class="sbar sbar-eb" style="height:${h}px;width:100%"></div></div>
-      <div class="sbar-lbl">${MONTHS[m][0]}</div>
+  el.innerHTML=`<div style="display:flex;gap:2px;align-items:flex-end">${bars}</div>
+    <div class="combo-legend">
+      <span><div class="combo-sw" style="background:var(--moss)"></div>Your station</span>
+      ${ebData?`<span><div class="combo-sw" style="background:rgba(91,143,168,0.5)"></div>eBird Nevada Co.</span>`:''}
     </div>`;
-  }).join('');
 }
 
 function buildPanelHist(){
