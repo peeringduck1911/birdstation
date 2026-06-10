@@ -34,7 +34,8 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 /* HERO */
 .hero{background:linear-gradient(135deg,rgba(61,90,62,0.06) 0%,rgba(200,151,90,0.08) 100%);border-bottom:1px solid rgba(26,26,20,0.08);padding:16px 20px}
 .hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.hero-stat{text-align:center;padding:8px 4px;border-right:1px solid rgba(26,26,20,0.1)}
+.hero-stat{text-align:center;padding:8px 4px;border-right:1px solid rgba(26,26,20,0.1);cursor:pointer;transition:background .15s;border-radius:4px}
+.hero-stat:hover{background:rgba(61,90,62,0.07)}
 .hero-stat:last-child{border-right:none}
 .hero-stat .val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--moss);line-height:1}
 .hero-stat .lbl{font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(26,26,20,0.45);margin-top:4px}
@@ -55,13 +56,10 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .section-sub{font-size:0.56rem;color:rgba(26,26,20,0.38)}
 .recent-scroll{display:flex;gap:10px;padding:4px 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .recent-scroll::-webkit-scrollbar{display:none}
-.recent-card{flex-shrink:0;width:130px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:transform .15s}
+.recent-card{flex-shrink:0;width:120px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;padding:10px 10px 8px;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:transform .15s;display:flex;flex-direction:column;gap:3px}
 .recent-card:active{transform:scale(0.97)}
-.recent-thumb{width:130px;height:88px;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;flex-shrink:0}
-.recent-thumb img{width:100%;height:100%;object-fit:cover}
-.recent-info{padding:8px}
 .recent-name{font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;color:var(--moss);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recent-time{font-size:0.54rem;color:rgba(26,26,20,0.4);margin-top:2px}
+.recent-time{font-size:0.52rem;color:rgba(26,26,20,0.4)}
 .conf-badge{font-size:0.52rem;padding:1px 5px;border-radius:8px;font-weight:500;display:inline-block;margin-top:3px}
 .conf-high{background:rgba(76,175,119,.15);color:#2a7a4a}
 .conf-med{background:rgba(200,151,90,.15);color:#a06830}
@@ -87,15 +85,21 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 
 /* HOURLY CHART */
 .hourly-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.hourly-chart{display:flex;align-items:flex-end;gap:2px;min-width:360px;padding:8px 0 0}
-.h-col{flex:1;min-width:18px;position:relative;height:110px;display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.h-col:hover .h-bar{opacity:0.7}
+.hourly-chart{display:block;min-width:360px;padding:4px 0 0}
+.hourly-bars{display:flex;align-items:flex-end;gap:2px;width:100%}
+.h-col{flex:1;min-width:18px;position:relative;height:96px;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.h-col:hover .h-bar-stack{opacity:0.7}
 .h-tip{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:3px 7px;border-radius:3px;font-size:0.58rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10}
 .h-col:hover .h-tip{opacity:1}
 .h-val{font-size:0.42rem;color:rgba(26,26,20,0.5);text-align:center;min-height:10px;line-height:10px}
 .h-spacer{flex:1;width:100%;display:flex;align-items:flex-end}
-.h-bar{width:75%;margin:0 auto;border-radius:2px 2px 0 0;transition:height .3s,opacity .15s}
-.h-lbl{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:0.44rem;color:rgba(26,26,20,.4);white-space:nowrap}
+.h-bar-stack{width:80%;margin:0 auto;border-radius:2px 2px 0 0;overflow:hidden;display:flex;flex-direction:column-reverse;transition:opacity .15s}
+.h-lbl{font-size:0.44rem;color:rgba(26,26,20,.4);white-space:nowrap;padding-top:2px;text-align:center}
+/* HOUR LEGEND */
+.sp-legend{display:flex;flex-wrap:wrap;gap:3px 10px;padding:8px 2px 0;margin-top:4px;border-top:1px solid rgba(26,26,20,0.08)}
+.legend-item{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.55rem;color:rgba(26,26,20,0.65);padding:2px 0}
+.legend-item:hover{color:var(--moss)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* HEATMAP */
 .heatmap-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
@@ -127,7 +131,9 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .sp-info{flex:1;min-width:0}
 .sp-name{font-family:'Playfair Display',serif;font-size:0.93rem;font-weight:700}
 .sp-sci{font-size:0.58rem;color:rgba(26,26,20,0.35);font-style:italic}
-.sp-meta{font-size:0.54rem;color:rgba(26,26,20,0.42);margin-top:3px}
+.sp-stats{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.sp-stat-badge{background:rgba(61,90,62,0.07);border-radius:4px;padding:3px 7px;font-size:0.68rem;color:var(--moss);font-weight:500;line-height:1.3}
+.sp-stat-lbl{font-size:0.52rem;color:rgba(26,26,20,0.4);font-weight:400}
 .sp-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .sp-count{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--moss)}
 .rare-flag{font-size:0.52rem;background:rgba(192,57,43,.1);color:var(--rare);border:1px solid rgba(192,57,43,.2);padding:2px 5px;border-radius:8px;font-weight:500;white-space:nowrap;vertical-align:middle}
@@ -259,10 +265,10 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
 
   <section class="hero">
     <div class="hero-grid">
-      <div class="hero-stat"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
-      <div class="hero-stat"><div class="val" id="h-dets">—</div><div class="lbl">detections</div></div>
-      <div class="hero-stat"><div class="val" id="h-peak">—</div><div class="lbl">peak hour</div></div>
-      <div class="hero-stat"><div class="val" id="h-streak">—</div><div class="lbl">day streak</div></div>
+      <div class="hero-stat" onclick="heroClickSpecies()"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
+      <div class="hero-stat" onclick="heroClickDets()"><div class="val" id="h-dets">—</div><div class="lbl">detections</div></div>
+      <div class="hero-stat" onclick="heroClickPeak()"><div class="val" id="h-peak">—</div><div class="lbl">peak hour</div></div>
+      <div class="hero-stat" onclick="heroClickAllSp()"><div class="val" id="h-allsp">—</div><div class="lbl">total species</div></div>
     </div>
   </section>
 
@@ -546,10 +552,18 @@ async function gql(query,vars={}){
 async function getAudioUrl(p){const d=await gql('query($p:String!){getAudioUrl(audioPath:$p)}',{p});return d.getAudioUrl}
 
 async function fetchRecent(){
+  const since=new Date(Date.now()-86400000);
   const q=`query{hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100){items{id dt cn sn score wav}nextToken}}`;
   const data=await gql(q);
   allDetections=data.hitBySerialByDate.items;
   nextToken=data.hitBySerialByDate.nextToken;
+  // Keep fetching until we have coverage back to 24h ago
+  while(nextToken&&allDetections.length>0&&new Date(allDetections[allDetections.length-1].dt)>since){
+    const qp=`query($nt:String){hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100,nextToken:$nt){items{id dt cn sn score wav}nextToken}}`;
+    const dp=await gql(qp,{nt:nextToken});
+    allDetections=[...allDetections,...dp.hitBySerialByDate.items];
+    nextToken=dp.hitBySerialByDate.nextToken;
+  }
 }
 
 async function fetchNextPage(){
@@ -612,8 +626,42 @@ function buildHero(){
   const hrs=Array(24).fill(0);today.forEach(d=>hrs[new Date(d.dt).getHours()]++);
   const peak=hrs.indexOf(Math.max(...hrs));
   $('h-peak').textContent=today.length?fmtHour(peak):'—';
-  const streak=calcStreak();
-  $('h-streak').textContent=streak?streak+(streak===1?' day':' days'):'—';
+  $('h-allsp').textContent=new Set(allDetections.map(d=>d.cn)).size||'—';
+}
+function heroClickSpecies(){
+  timeFilter='24h';
+  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
+  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
+  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Species');
+  if(btn)switchTab('species',btn);
+}
+function heroClickDets(){
+  timeFilter='24h';
+  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
+  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
+  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Feed');
+  if(btn)switchTab('feed',btn);
+}
+function heroClickPeak(){
+  const today=allDetections.filter(d=>isToday(d.dt));
+  if(!today.length)return;
+  const hrs=Array(24).fill(0);today.forEach(d=>hrs[new Date(d.dt).getHours()]++);
+  const peak=hrs.indexOf(Math.max(...hrs));
+  timeFilter='24h';
+  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
+  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
+  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Activity');
+  if(btn)switchTab('activity',btn);
+  setTimeout(()=>showHourDetail(peak),100);
+}
+function heroClickAllSp(){
+  timeFilter='all';
+  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
+  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='All')?.classList.add('active');
+  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Species');
+  if(!btn)return;
+  switchTab('species',btn);
+  ensureHistory().then(()=>{buildAll();setStatus('live',`${allDetections.length} detections`);});
 }
 
 // === BOTD ===
@@ -634,39 +682,58 @@ function botdClick(){const n=$('botd').dataset.species;if(n)openSpecies(n);}
 // === RECENT STRIP ===
 function buildRecent(){
   const recent=allDetections.slice(0,8);
-  $('recent-sub').textContent=`last ${recent.length}`;
-  if(!recent.length){$('recent-scroll').innerHTML='<div class="empty-state" style="padding:12px 20px">No detections yet</div>';return;}
+  $('recent-sub').textContent=recent.length?'last heard '+fmtTime(recent[0].dt):'';
+  if(!recent.length){$('recent-scroll').innerHTML='<div class="empty-state" style="padding:12px 20px">Nothing yet today</div>';return;}
   $('recent-scroll').innerHTML=recent.map(d=>{
-    const conf=Math.round(d.score*100);
-    const cls=confCls(d.score);
+    const conf=Math.round(d.score*100);const cls=confCls(d.score);
     return `<div class="recent-card" onclick="openSpecies('${d.cn.replace(/'/g,"\\'")}')">
-      <div class="recent-thumb">🐦</div>
-      <div class="recent-info">
-        <div class="recent-name">${d.cn}</div>
-        <div class="recent-time">${fmtTime(d.dt)} · ${fmtDate(d.dt)}</div>
-        <span class="conf-badge conf-${cls}">${conf}%</span>
-      </div>
+      <div class="recent-name">${d.cn}</div>
+      <div class="recent-time">${fmtTime(d.dt)}</div>
+      <span class="conf-badge conf-${cls}">${conf}%</span>
     </div>`;
   }).join('');
 }
 
-// === HOURLY CHART (clickable) ===
+// === HOURLY CHART (stacked by species) ===
+const SP_COLORS=['#3d5a3e','#c8975a','#5b8fa8','#8a5ba8','#c0392b','#2e86ab'];
 function buildHourly(f){
   const el=$('hourly-chart');
   if(!f.length){el.innerHTML='<div class="empty-state" style="width:100%">No data</div>';return;}
-  const hrs=Array(24).fill(0);f.forEach(d=>hrs[new Date(d.dt).getHours()]++);
-  const max=Math.max(1,...hrs);
-  const colors=['#3d5a3e','#4a6e4b','#577e58','#5b8fa8','#6a9e6e','#7a9e7e'];
-  el.innerHTML=hrs.map((c,h)=>{
+  // Per-hour per-species counts
+  const hourData=Array(24).fill(null).map(()=>({}));
+  f.forEach(d=>{const h=new Date(d.dt).getHours();hourData[h][d.cn]=(hourData[h][d.cn]||0)+1;});
+  // Top 6 species for consistent coloring
+  const totSp={};f.forEach(d=>totSp[d.cn]=(totSp[d.cn]||0)+1);
+  const topSp=Object.entries(totSp).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([n])=>n);
+  const colorMap={};topSp.forEach((sp,i)=>colorMap[sp]=SP_COLORS[i]);
+  const totals=hourData.map(h=>Object.values(h).reduce((s,v)=>s+v,0));
+  const max=Math.max(1,...totals);
+  const barsHtml=hourData.map((hd,h)=>{
+    const total=totals[h];
+    const barH=total>0?Math.max(2,Math.round(total/max*72)):0;
     const lbl=fmtHour(h);
-    const barH=c>0?Math.max(2,Math.round(c/max*72)):0;
+    let segsHtml='';
+    if(total>0){
+      const sorted=Object.entries(hd).sort((a,b)=>(totSp[b[0]]||0)-(totSp[a[0]]||0));
+      let othCnt=0;
+      sorted.forEach(([sp,cnt])=>{
+        if(colorMap[sp]){segsHtml+=`<div style="height:${Math.max(1,Math.round(cnt/total*barH))}px;background:${colorMap[sp]}"></div>`;}
+        else{othCnt+=cnt;}
+      });
+      if(othCnt>0)segsHtml=`<div style="height:${Math.max(1,Math.round(othCnt/total*barH))}px;background:rgba(26,26,20,0.18)"></div>`+segsHtml;
+    }
     return `<div class="h-col" onclick="showHourDetail(${h})">
-      <div class="h-tip">${lbl}: ${c}</div>
-      <div class="h-val">${c>0?c:''}</div>
-      <div class="h-spacer"><div class="h-bar" style="height:${barH}px;background:${colors[h%colors.length]}"></div></div>
+      <div class="h-tip">${lbl}: ${total}</div>
+      <div class="h-val">${total>0?total:''}</div>
+      <div class="h-spacer"><div class="h-bar-stack" style="height:${barH}px">${segsHtml}</div></div>
       <div class="h-lbl">${lbl}</div>
     </div>`;
   }).join('');
+  const legendHtml=topSp.length?`<div class="sp-legend">${topSp.map((sp,i)=>
+    `<div class="legend-item" onclick="event.stopPropagation();openSpecies('${sp.replace(/'/g,"\\'")}')">
+      <div class="legend-dot" style="background:${SP_COLORS[i]}"></div><span>${sp}</span>
+    </div>`).join('')}</div>`:'';
+  el.innerHTML=`<div class="hourly-bars">${barsHtml}</div>${legendHtml}`;
 }
 
 // === HOUR DETAIL PANEL ===
@@ -807,7 +874,11 @@ function buildSpeciesList(f){
       <div class="sp-info">
         <div class="sp-name">${r.name}${rare?'<span class="rare-flag" style="margin-left:6px">Rare</span>':''}</div>
         <div class="sp-sci">${r.sci}</div>
-        <div class="sp-meta">${perDay}/day avg · ${peakLbl} · ${Math.round(avg*100)}% avg conf</div>
+        <div class="sp-stats">
+          <span class="sp-stat-badge">${perDay}<span class="sp-stat-lbl"> /day</span></span>
+          <span class="sp-stat-badge">${r.count>0?fmtHour(peak):'—'}<span class="sp-stat-lbl"> peak</span></span>
+          <span class="sp-stat-badge">${Math.round(avg*100)}%<span class="sp-stat-lbl"> conf</span></span>
+        </div>
       </div>
       <div class="sp-right">
         <span class="sp-count">${r.count}</span>
