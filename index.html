@@ -4,160 +4,219 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Pam & Hugo · Bird Station</title>
+<title>Pam &amp; Hugo · Bird Station</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#1a1a14;--paper:#f5f0e8;--moss:#3d5a3e;--sage:#7a9e7e;--dawn:#c8975a;--mist:#e8e0d0;--shadow:rgba(26,26,20,0.10);--rare:#c0392b}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--paper);color:var(--ink);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden}
-header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);padding:14px 20px 12px;position:sticky;top:0;z-index:100}
-.header-inner{display:flex;align-items:flex-end;justify-content:space-between}
-.header-title h1{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--moss);line-height:1}
-.header-title .subtitle{font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--dawn);margin-top:3px}
-.refresh-btn{background:none;border:1px solid rgba(26,26,20,0.2);color:rgba(26,26,20,0.5);padding:5px 10px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer}
-.status-bar{display:flex;align-items:center;gap:8px;font-size:0.66rem;color:var(--dawn);padding:7px 20px;background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.08)}
+
+/* HEADER */
+header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);padding:12px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.logo h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--moss);line-height:1}
+.logo p{font-size:0.55rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--dawn);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.status-pill{display:flex;align-items:center;gap:5px;font-size:0.58rem;color:rgba(26,26,20,0.5);padding:4px 9px;border-radius:20px;background:rgba(26,26,20,0.05);border:1px solid rgba(26,26,20,0.1)}
 .sdot{width:6px;height:6px;border-radius:50%;background:var(--dawn);flex-shrink:0}
 .sdot.live{background:#4caf77;animation:pulse 2s infinite}
 .sdot.error{background:var(--rare)}
+.refresh-btn{background:none;border:1px solid rgba(26,26,20,0.2);color:rgba(26,26,20,0.5);padding:5px 10px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-.botd{margin:12px 20px 10px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;padding:12px 16px;box-shadow:0 1px 6px var(--shadow);cursor:pointer;transition:transform .15s}
+
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 20px;color:var(--moss);font-size:0.74rem}
+.dots span{display:inline-block;animation:blink 1.4s infinite both;font-size:1.6rem}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+.error-msg{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);padding:11px 15px;border-radius:4px;font-size:0.72rem;margin:14px 20px}
+.empty-state{color:rgba(26,26,20,.35);font-size:.73rem;padding:28px 0;text-align:center}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,rgba(61,90,62,0.06) 0%,rgba(200,151,90,0.08) 100%);border-bottom:1px solid rgba(26,26,20,0.08);padding:16px 20px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.hero-stat{text-align:center;padding:8px 4px;border-right:1px solid rgba(26,26,20,0.1)}
+.hero-stat:last-child{border-right:none}
+.hero-stat .val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--moss);line-height:1}
+.hero-stat .lbl{font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(26,26,20,0.45);margin-top:4px}
+
+/* BOTD */
+.botd{margin:12px 20px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:10px;padding:14px 16px;box-shadow:0 1px 6px var(--shadow);cursor:pointer;transition:transform .15s}
 .botd:active{transform:scale(0.98)}
-.botd-label{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--dawn);margin-bottom:5px}
-.botd-content{display:flex;align-items:center;justify-content:space-between}
-.botd-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--moss)}
-.botd-sci{font-size:0.62rem;color:rgba(26,26,20,0.4);font-style:italic;margin-top:2px}
-.botd-count{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--moss)}
-.botd-count-label{font-size:0.58rem;color:rgba(26,26,20,0.4);text-align:right}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px 10px}
-.stat-card{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:6px;padding:10px 12px;box-shadow:0 1px 4px var(--shadow)}
-.stat-label{font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(26,26,20,0.45);margin-bottom:5px}
-.stat-value{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--moss);line-height:1}
-.stat-sub{font-size:0.58rem;color:var(--dawn);margin-top:2px}
-.filter-strip{padding:8px 20px;background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.1);display:flex;flex-direction:column;gap:7px}
-.filter-row{display:flex;align-items:center;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-label{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(26,26,20,0.4);white-space:nowrap;flex-shrink:0}
+.botd-lbl{font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--dawn);margin-bottom:6px}
+.botd-body{display:flex;align-items:center;justify-content:space-between}
+.botd-name{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--moss)}
+.botd-sci{font-size:0.6rem;color:rgba(26,26,20,0.38);font-style:italic;margin-top:2px}
+.botd-count{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--moss);line-height:1;text-align:right}
+.botd-count-lbl{font-size:0.55rem;color:rgba(26,26,20,0.4);margin-top:2px;text-align:right}
+
+/* RECENT STRIP */
+.section-header{display:flex;align-items:baseline;justify-content:space-between;padding:14px 20px 8px}
+.section-title{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss);font-weight:500}
+.section-sub{font-size:0.56rem;color:rgba(26,26,20,0.38)}
+.recent-scroll{display:flex;gap:10px;padding:4px 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.recent-scroll::-webkit-scrollbar{display:none}
+.recent-card{flex-shrink:0;width:130px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px var(--shadow);cursor:pointer;transition:transform .15s}
+.recent-card:active{transform:scale(0.97)}
+.recent-thumb{width:130px;height:88px;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;flex-shrink:0}
+.recent-thumb img{width:100%;height:100%;object-fit:cover}
+.recent-info{padding:8px}
+.recent-name{font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;color:var(--moss);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-time{font-size:0.54rem;color:rgba(26,26,20,0.4);margin-top:2px}
+.conf-badge{font-size:0.52rem;padding:1px 5px;border-radius:8px;font-weight:500;display:inline-block;margin-top:3px}
+.conf-high{background:rgba(76,175,119,.15);color:#2a7a4a}
+.conf-med{background:rgba(200,151,90,.15);color:#a06830}
+.conf-low{background:rgba(26,26,20,.08);color:rgba(26,26,20,.45)}
+
+/* FILTER BAR */
+.filter-bar{padding:8px 20px;border-top:1px solid rgba(26,26,20,0.08);border-bottom:1px solid rgba(26,26,20,0.08);display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-sep{width:1px;height:16px;background:rgba(26,26,20,0.15);flex-shrink:0}
 .chip{background:none;border:1px solid rgba(26,26,20,0.2);border-radius:20px;padding:4px 11px;font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(26,26,20,0.55);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .chip.active{background:var(--moss);border-color:var(--moss);color:white}
-.chip.rare-chip.active{background:var(--rare);border-color:var(--rare);color:white}
-.tabs{display:flex;border-bottom:1px solid rgba(26,26,20,0.15);background:var(--paper);position:sticky;top:62px;z-index:99}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid rgba(26,26,20,0.15);background:var(--paper);position:sticky;top:57px;z-index:99}
 .tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;padding:9px 0;font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(26,26,20,0.45);cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:-1px}
 .tab-btn.active{color:var(--moss);border-bottom-color:var(--moss);font-weight:500}
 .tab-pane{display:none}.tab-pane.active{display:block}
-.view-toggle{display:flex;padding:10px 20px 0}
-.view-btn{flex:1;background:var(--mist);border:1px solid rgba(26,26,20,0.15);padding:7px;font-family:'DM Mono',monospace;font-size:0.63rem;color:rgba(26,26,20,0.5);cursor:pointer;transition:all .15s}
-.view-btn:first-child{border-radius:4px 0 0 4px}
-.view-btn:last-child{border-radius:0 4px 4px 0;border-left:none}
-.view-btn.active{background:var(--moss);border-color:var(--moss);color:white}
-.det-list{padding:0 20px}
+
+/* CHART CARDS */
+.chart-card{margin:12px 20px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;padding:14px;box-shadow:0 1px 4px var(--shadow)}
+.chart-title{font-size:0.63rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:12px}
+.chart-hint{font-size:0.52rem;color:rgba(26,26,20,0.35);margin-left:4px;font-weight:400;letter-spacing:0;text-transform:none}
+
+/* HOURLY CHART */
+.hourly-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.hourly-chart{display:flex;align-items:flex-end;gap:2px;min-width:360px;padding:8px 0 0}
+.h-col{flex:1;min-width:18px;position:relative;height:110px;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.h-col:hover .h-bar{opacity:0.7}
+.h-tip{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:3px 7px;border-radius:3px;font-size:0.58rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10}
+.h-col:hover .h-tip{opacity:1}
+.h-val{font-size:0.42rem;color:rgba(26,26,20,0.5);text-align:center;min-height:10px;line-height:10px}
+.h-spacer{flex:1;width:100%;display:flex;align-items:flex-end}
+.h-bar{width:75%;margin:0 auto;border-radius:2px 2px 0 0;transition:height .3s,opacity .15s}
+.h-lbl{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:0.44rem;color:rgba(26,26,20,.4);white-space:nowrap}
+
+/* HEATMAP */
+.heatmap-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.heatmap-grid{display:flex;gap:0}
+.heatmap-dow{display:flex;flex-direction:column;gap:2px;margin-right:4px;padding-top:18px;flex-shrink:0}
+.dow-lbl{font-size:0.38rem;color:rgba(26,26,20,.4);height:11px;display:flex;align-items:center;width:16px}
+.heatmap-weeks{display:flex;gap:2px;flex-direction:column}
+.heatmap-months{display:flex;gap:2px;margin-bottom:4px;height:14px;align-items:flex-end}
+.month-lbl-slot{font-size:0.40rem;color:rgba(26,26,20,.4);white-space:nowrap;overflow:hidden}
+.heatmap-cols{display:flex;gap:2px}
+.heatmap-week{display:flex;flex-direction:column;gap:2px}
+.h-cell{width:11px;height:11px;border-radius:2px;cursor:pointer;flex-shrink:0}
+.h-cell:hover{outline:1px solid rgba(26,26,20,0.4)}
+.h-cell.future{background:#f0ece4;cursor:default}
+
+/* TOP SPECIES BARS */
+.spbar-row{display:flex;align-items:center;gap:7px;cursor:pointer;padding:2px 0}
+.spbar-name{font-family:'Playfair Display',serif;font-size:0.78rem;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spbar-name:hover{color:var(--moss)}
+.spbar-track{flex:1;height:14px;background:var(--mist);border-radius:3px;overflow:hidden}
+.spbar-fill{height:100%;background:var(--moss);border-radius:3px}
+.spbar-count{font-size:0.65rem;color:var(--dawn);font-weight:500;width:26px;text-align:right;flex-shrink:0}
+.sp-bars{display:flex;flex-direction:column;gap:6px}
+
+/* SPECIES LIST */
+.sp-list-wrap{padding:0 20px}
+.sp-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(26,26,20,0.07);cursor:pointer}
+.sp-row:active{background:rgba(61,90,62,0.03)}
+.sp-info{flex:1;min-width:0}
+.sp-name{font-family:'Playfair Display',serif;font-size:0.93rem;font-weight:700}
+.sp-sci{font-size:0.58rem;color:rgba(26,26,20,0.35);font-style:italic}
+.sp-meta{font-size:0.54rem;color:rgba(26,26,20,0.42);margin-top:3px}
+.sp-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.sp-count{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--moss)}
+.rare-flag{font-size:0.52rem;background:rgba(192,57,43,.1);color:var(--rare);border:1px solid rgba(192,57,43,.2);padding:2px 5px;border-radius:8px;font-weight:500;white-space:nowrap;vertical-align:middle}
+.chevron{font-size:0.68rem;color:rgba(26,26,20,0.25)}
+
+/* FEED */
+.feed-wrap{padding:0 20px}
 .det-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(26,26,20,0.07);cursor:pointer}
-.det-row:active{background:rgba(61,90,62,0.04)}
-.det-row-left{flex:1;min-width:0}
+.det-left{flex:1;min-width:0}
 .det-name{font-family:'Playfair Display',serif;font-size:0.93rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .det-meta{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap}
 .det-time{font-size:0.6rem;color:rgba(26,26,20,0.4)}
 .det-sci{font-size:0.58rem;color:rgba(26,26,20,0.32);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
-.det-row-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.conf-badge{font-size:0.57rem;letter-spacing:0.07em;text-transform:uppercase;padding:2px 6px;border-radius:10px;font-weight:500}
-.conf-high{background:rgba(76,175,119,.15);color:#2a7a4a}
-.conf-med{background:rgba(200,151,90,.15);color:#a06830}
-.conf-low{background:rgba(26,26,20,.08);color:rgba(26,26,20,.45)}
+.det-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
 .play-btn{width:26px;height:26px;border-radius:50%;background:var(--paper);border:1px solid rgba(26,26,20,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.68rem;color:var(--moss);flex-shrink:0}
 .play-btn.playing{background:var(--moss);color:white;border-color:var(--moss)}
-.chevron{font-size:0.68rem;color:rgba(26,26,20,0.25);transition:transform .2s;display:inline-block}
-.chevron.open{transform:rotate(90deg)}
-.sp-group{border-bottom:1px solid rgba(26,26,20,0.07)}
-.sp-group-header{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer}
-.sp-group-header:active{background:rgba(61,90,62,0.04)}
-.sp-group-info{flex:1;min-width:0}
-.sp-group-name{font-family:'Playfair Display',serif;font-size:0.93rem;font-weight:700}
-.sp-group-meta{font-size:0.58rem;color:rgba(26,26,20,0.4);margin-top:2px}
-.sp-group-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.sp-group-count{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--moss)}
-.sp-group-body{display:none;background:rgba(61,90,62,0.025);border-top:1px solid rgba(26,26,20,0.05)}
-.sp-group-body.open{display:block}
-.sp-group-body .det-row{padding:9px 20px;border-bottom:1px solid rgba(26,26,20,0.05)}
-.sp-group-body .det-row:last-child{border-bottom:none}
-.rare-flag{font-size:0.52rem;background:rgba(192,57,43,.1);color:var(--rare);border:1px solid rgba(192,57,43,.2);padding:2px 5px;border-radius:8px;font-weight:500;white-space:nowrap;vertical-align:middle}
-.load-more-row{text-align:center;padding:18px}
+.load-more-wrap{text-align:center;padding:18px}
 .load-more-btn{background:transparent;color:var(--moss);border:1px solid var(--moss);padding:7px 18px;font-family:'DM Mono',monospace;font-size:0.7rem;border-radius:4px;cursor:pointer}
-.sp-list{padding:0 20px}
-.sp-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(26,26,20,0.07);cursor:pointer}
-.sp-row-info{flex:1;min-width:0}
-.sp-row-name{font-family:'Playfair Display',serif;font-size:0.93rem;font-weight:700}
-.sp-row-sci{font-size:0.58rem;color:rgba(26,26,20,0.35);font-style:italic}
-.sp-row-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.sp-count{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--moss)}
-.chart-section{margin:12px 20px;background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;padding:14px;box-shadow:0 1px 4px var(--shadow)}
-.chart-title{font-size:0.63rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:12px}
-.timeline-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.timeline-chart{display:flex;align-items:flex-end;gap:2px;min-width:360px;padding:16px 0 22px;position:relative}
-.tbar-col{flex:1;min-width:18px;position:relative;height:110px;display:flex;flex-direction:column;align-items:center}
-.tbar-col:hover .tbar-tip{opacity:1}
-.tbar-spacer{flex:1;width:100%;display:flex;align-items:flex-end}
-.tbar{width:75%;margin:0 auto;border-radius:2px 2px 0 0;transition:height .3s}
-.tbar-val{font-size:0.42rem;color:rgba(26,26,20,0.5);text-align:center;min-height:10px;line-height:10px}
-.tbar-lbl{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:0.44rem;color:rgba(26,26,20,.4);white-space:nowrap}
-.tbar-tip{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:3px 7px;border-radius:3px;font-size:0.58rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10}
-.hbar-chart{display:flex;flex-direction:column;gap:6px}
-.hbar-row{display:flex;align-items:center;gap:7px}
-.hbar-label{font-family:'Playfair Display',serif;font-size:0.75rem;width:150px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.hbar-label:hover{color:var(--moss)}
-.hbar-track{flex:1;height:15px;background:var(--mist);border-radius:3px;overflow:hidden}
-.hbar-fill{height:100%;background:var(--moss);border-radius:3px}
-.hbar-count{font-size:0.65rem;color:var(--dawn);font-weight:500;width:26px;text-align:right;flex-shrink:0}
-.panel-overlay{position:fixed;inset:0;background:rgba(26,26,20,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
-.panel-overlay.open{opacity:1;pointer-events:all}
-.panel{position:fixed;right:0;top:0;bottom:0;width:100%;max-width:480px;background:var(--paper);z-index:201;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
-.panel.open{transform:translateX(0)}
-.panel-header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);padding:14px 20px;position:sticky;top:0;z-index:10}
-.panel-back{background:none;border:none;color:var(--moss);font-family:'DM Mono',monospace;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:8px;padding:0}
-.panel-name{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--moss)}
-.panel-sci{font-size:0.65rem;color:rgba(26,26,20,0.4);font-style:italic;margin-top:2px}
-.panel-links{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.ebird-link{font-size:0.62rem;color:var(--moss);text-decoration:none;border:1px solid rgba(61,90,62,0.3);border-radius:4px;padding:3px 8px;display:inline-flex;align-items:center;gap:4px}
-.ebird-link:hover{background:rgba(61,90,62,0.08)}
-.panel-badges{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
-.panel-stat{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:5px;padding:5px 9px;font-size:0.62rem;color:rgba(26,26,20,0.55)}
-.panel-stat strong{color:var(--moss);font-size:0.85rem;font-family:'Playfair Display',serif;display:block}
-.panel-rare{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);border-radius:5px;padding:8px 12px;font-size:0.66rem;line-height:1.5;margin-top:10px}
-.panel-section{padding:14px 20px 0}
-.panel-section-title{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:4px}
-.panel-section-sub{font-size:0.58rem;color:rgba(26,26,20,0.38);margin-bottom:10px}
-.seasonal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;overflow-y:visible}
-.seasonal-bars{display:flex;gap:3px;align-items:stretch;min-width:280px;margin-bottom:4px;height:96px}
-.sbar-col{display:flex;flex-direction:column;align-items:center;flex:1}
-.sbar{border-radius:2px 2px 0 0;width:100%;min-height:0}
-.sbar-my{background:var(--moss)}
-.sbar-eb{background:rgba(91,143,168,0.6)}
-.sbar-cur .sbar-my{background:var(--dawn)}
-.sbar-cur .sbar-eb{background:rgba(200,151,90,0.7)}
-.sbar-lbl{font-size:0.44rem;color:rgba(26,26,20,.4);margin-top:3px;text-align:center}
-.sbar-cur .sbar-lbl{color:var(--dawn);font-weight:500}
-.date-filter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.date-chip{background:none;border:1px solid rgba(26,26,20,0.2);border-radius:20px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(26,26,20,0.55);cursor:pointer;white-space:nowrap}
-.date-chip.active{background:var(--moss);border-color:var(--moss);color:white}
-.hist-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(26,26,20,0.07)}
-.hist-time{font-size:0.7rem;color:var(--ink);font-weight:500;flex-shrink:0;width:50px}
-.hist-date{font-size:0.6rem;color:rgba(26,26,20,0.4);flex-shrink:0}
-.hist-right{margin-left:auto;display:flex;align-items:center;gap:7px}
-.loading-msg{text-align:center;padding:60px 20px;color:var(--moss);font-size:0.74rem}
-.loading-dots span{display:inline-block;animation:blink 1.4s infinite both;font-size:1.4rem}
-.loading-dots span:nth-child(2){animation-delay:.2s}.loading-dots span:nth-child(3){animation-delay:.4s}
-@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
-.error-msg{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);padding:11px 15px;border-radius:4px;font-size:0.72rem;margin:14px 20px}
-.empty-msg{color:rgba(26,26,20,.35);font-size:.73rem;padding:22px 0;text-align:center}
-footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);letter-spacing:.06em}
-.cam-card{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;margin-bottom:12px;box-shadow:0 1px 4px var(--shadow);overflow:hidden;display:flex;gap:0}
-.cam-photo{width:110px;min-height:90px;background:var(--mist);object-fit:cover;flex-shrink:0}
-.cam-photo-placeholder{width:110px;min-height:90px;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+
+/* CAMERA */
+.cam-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px 10px}
+.stat-mini{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:6px;padding:10px 12px;box-shadow:0 1px 4px var(--shadow)}
+.stat-mini .val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--moss);line-height:1}
+.stat-mini .lbl{font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(26,26,20,0.45);margin-bottom:5px}
+.cam-grid{padding:0 20px;display:flex;flex-direction:column;gap:10px;padding-bottom:20px}
+.cam-card{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;box-shadow:0 1px 4px var(--shadow);overflow:hidden;display:flex}
+.cam-thumb{width:110px;min-height:90px;background:var(--mist);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden}
+.cam-thumb img{width:110px;height:90px;object-fit:cover}
 .cam-info{padding:12px;flex:1;min-width:0}
 .cam-species{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--moss)}
 .cam-sci{font-size:0.6rem;color:rgba(26,26,20,0.35);font-style:italic;margin-top:2px}
 .cam-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
 .cam-time{font-size:0.62rem;color:rgba(26,26,20,0.4)}
 .cam-conf{font-size:0.58rem;background:rgba(76,175,119,.15);color:#2a7a4a;padding:2px 6px;border-radius:10px;font-weight:500}
+
+/* HOUR BOTTOM SHEET */
+.bottom-overlay{position:fixed;inset:0;background:rgba(26,26,20,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.bottom-overlay.open{opacity:1;pointer-events:all}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;max-height:72vh;background:var(--paper);border-radius:14px 14px 0 0;z-index:201;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+.bottom-sheet.open{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:rgba(26,26,20,0.15);border-radius:2px;margin:10px auto 4px}
+.sheet-hdr{padding:8px 20px 12px;border-bottom:1px solid rgba(26,26,20,0.08)}
+.sheet-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--moss)}
+.sheet-sub{font-size:0.6rem;color:rgba(26,26,20,0.45);margin-top:2px}
+.sheet-body{padding:14px 20px 32px;display:flex;flex-direction:column;gap:8px}
+
+/* SPECIES PANEL */
+.panel-overlay{position:fixed;inset:0;background:rgba(26,26,20,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.sp-panel{position:fixed;right:0;top:0;bottom:0;width:100%;max-width:480px;background:var(--paper);z-index:201;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+.sp-panel.open{transform:translateX(0)}
+.panel-hdr{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);padding:14px 20px;position:sticky;top:0;z-index:10}
+.panel-back{background:none;border:none;color:var(--moss);font-family:'DM Mono',monospace;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:8px;padding:0}
+.panel-name{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--moss)}
+.panel-sci{font-size:0.65rem;color:rgba(26,26,20,0.4);font-style:italic;margin-top:2px}
+.panel-links{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.ebird-link{font-size:0.62rem;color:var(--moss);text-decoration:none;border:1px solid rgba(61,90,62,0.3);border-radius:4px;padding:3px 8px;display:inline-flex;align-items:center;gap:4px}
+.panel-badges{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
+.panel-stat{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:5px;padding:5px 9px;font-size:0.62rem;color:rgba(26,26,20,0.55)}
+.panel-stat strong{color:var(--moss);font-size:0.85rem;font-family:'Playfair Display',serif;display:block}
+.panel-rare-box{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);border-radius:5px;padding:8px 12px;font-size:0.66rem;line-height:1.5;margin-top:10px}
+.panel-section{padding:14px 20px 0}
+.panel-sec-title{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--moss);font-weight:500;margin-bottom:8px}
+.panel-sec-sub{font-size:0.58rem;color:rgba(26,26,20,0.38);margin-bottom:8px}
+
+/* PEAK HOUR MINI CHART */
+.peak-chart{display:flex;align-items:flex-end;gap:1px;height:44px}
+.peak-bar{flex:1;border-radius:1px 1px 0 0;min-height:1px;transition:height .3s}
+.peak-lbl{display:flex;justify-content:space-between;font-size:0.40rem;color:rgba(26,26,20,.32);margin-top:4px}
+
+/* SEASONAL */
+.seasonal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.seasonal-bars{display:flex;gap:3px;align-items:flex-end;min-width:280px;height:72px;margin-bottom:4px}
+.sbar-col{display:flex;flex-direction:column;align-items:center;flex:1}
+.sbar{border-radius:2px 2px 0 0;width:100%;min-height:0}
+.sbar-my{background:var(--moss)}.sbar-eb{background:rgba(91,143,168,0.6)}
+.sbar-cur .sbar-my{background:var(--dawn)}.sbar-cur .sbar-eb{background:rgba(200,151,90,0.7)}
+.sbar-lbl{font-size:0.44rem;color:rgba(26,26,20,.4);margin-top:3px;text-align:center}
+.sbar-cur .sbar-lbl{color:var(--dawn);font-weight:500}
+
+/* PANEL HISTORY */
+.date-chip-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.date-chip{background:none;border:1px solid rgba(26,26,20,0.2);border-radius:20px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(26,26,20,0.55);cursor:pointer;white-space:nowrap}
+.date-chip.active{background:var(--moss);border-color:var(--moss);color:white}
+.hist-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(26,26,20,0.07)}
+.hist-time{font-size:0.7rem;color:var(--ink);font-weight:500;flex-shrink:0;width:50px}
+.hist-date{font-size:0.6rem;color:rgba(26,26,20,0.4);flex-shrink:0}
+.hist-right{margin-left:auto;display:flex;align-items:center;gap:7px}
+
 /* CALENDAR */
 .cal-overlay{position:fixed;inset:0;z-index:300;background:rgba(26,26,20,0.35);display:none;align-items:flex-end;justify-content:center}
 .cal-overlay.open{display:flex}
@@ -165,10 +224,10 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .cal-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--moss);font-weight:700}
 .cal-nav{background:none;border:1px solid rgba(26,26,20,0.2);border-radius:4px;width:28px;height:28px;cursor:pointer;font-size:0.8rem;color:var(--moss);display:flex;align-items:center;justify-content:center}
-.cal-close{background:none;border:none;font-size:0.7rem;color:rgba(26,26,20,0.4);cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:0.06em}
+.cal-close{background:none;border:none;font-size:0.7rem;color:rgba(26,26,20,0.4);cursor:pointer;font-family:'DM Mono',monospace}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:10px}
 .cal-dow{text-align:center;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(26,26,20,0.35);padding:4px 0}
-.cal-day{text-align:center;padding:7px 2px;border-radius:6px;font-size:0.72rem;cursor:pointer;transition:background .12s;border:none;background:none;font-family:'DM Mono',monospace;color:var(--ink)}
+.cal-day{text-align:center;padding:7px 2px;border-radius:6px;font-size:0.72rem;cursor:pointer;border:none;background:none;font-family:'DM Mono',monospace;color:var(--ink)}
 .cal-day:hover{background:var(--mist)}
 .cal-day.has-data{font-weight:500;color:var(--moss)}
 .cal-day.has-data::after{content:'·';display:block;font-size:0.6rem;color:var(--sage);margin-top:-2px;line-height:1}
@@ -177,104 +236,165 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
 .cal-day.today{border:1px solid var(--dawn)}
 .cal-day.empty{cursor:default}
 .cal-clear{width:100%;background:none;border:1px solid rgba(26,26,20,0.15);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:rgba(26,26,20,0.45);cursor:pointer;margin-top:4px}
-.cal-clear:hover{border-color:var(--rare);color:var(--rare)}
+
+footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);letter-spacing:.06em}
 </style>
 </head>
 <body>
-<header>
-  <div class="header-inner">
-    <div class="header-title">
-      <h1>Pam &amp; Hugo</h1>
-      <div class="subtitle">Bird Station · Nevada County, CA</div>
-    </div>
-    <button class="refresh-btn" onclick="init()">↻ Refresh</button>
-  </div>
-</header>
-<div class="status-bar"><div class="sdot" id="sdot"></div><span id="stxt">Connecting…</span></div>
-<div id="err"></div>
-<div id="loading" class="loading-msg">
-  <div class="loading-dots"><span>·</span><span>·</span><span>·</span></div>
+
+<div id="loading" class="loading-wrap">
+  <div class="dots"><span>·</span><span>·</span><span>·</span></div>
   <div style="margin-top:10px">Fetching your birds</div>
 </div>
+<div id="err"></div>
+
 <div id="app" style="display:none">
-  <div class="botd" id="botd" onclick="openSpeciesFromBotd()">
-    <div class="botd-label">🏆 Bird of the Day</div>
-    <div class="botd-content">
+  <header>
+    <div class="logo"><h1>Pam &amp; Hugo</h1><p>Bird Station · Nevada County, CA</p></div>
+    <div class="hdr-right">
+      <div class="status-pill"><div class="sdot" id="sdot"></div><span id="stxt">–</span></div>
+      <button class="refresh-btn" onclick="init()">↻ Refresh</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-stat"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
+      <div class="hero-stat"><div class="val" id="h-dets">—</div><div class="lbl">detections</div></div>
+      <div class="hero-stat"><div class="val" id="h-peak">—</div><div class="lbl">peak hour</div></div>
+      <div class="hero-stat"><div class="val" id="h-streak">—</div><div class="lbl">day streak</div></div>
+    </div>
+  </section>
+
+  <div class="botd" id="botd" onclick="botdClick()">
+    <div class="botd-lbl">🏆 Bird of the Day</div>
+    <div class="botd-body">
       <div><div class="botd-name" id="botd-name">—</div><div class="botd-sci" id="botd-sci"></div></div>
-      <div style="text-align:right"><div class="botd-count" id="botd-count">0</div><div class="botd-count-label">detections<br><span id="botd-period">today</span></div></div>
-    </div>
-  </div>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Species</div><div class="stat-value" id="s-species">—</div><div class="stat-sub">in window</div></div>
-    <div class="stat-card"><div class="stat-label">Detections</div><div class="stat-value" id="s-dets">—</div><div class="stat-sub">in window</div></div>
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="s-total">—</div><div class="stat-sub">all loaded</div></div>
-  </div>
-  <div class="filter-strip">
-    <div class="filter-row" id="time-row">
-      <span class="filter-label">Time:</span>
-      <button class="chip" onclick="setTimeFilter('1h',this)">1h</button>
-      <button class="chip" onclick="setTimeFilter('12h',this)">12h</button>
-      <button class="chip active" onclick="setTimeFilter('24h',this)">24h</button>
-      <button class="chip" onclick="setTimeFilter('week',this)">Week</button>
-      <button class="chip" onclick="setTimeFilter('month',this)">Month</button>
-      <button class="chip" onclick="setTimeFilter('year',this)">Year</button>
-      <button class="chip" onclick="setTimeFilter('all',this)">All</button>
-      <button class="chip" id="cal-chip" onclick="openCal()">📅 Pick day</button>
-    </div>
-    <div class="filter-row" id="conf-row">
-      <span class="filter-label">Conf:</span>
-      <button class="chip active" onclick="setConfFilter('all',this)">All</button>
-      <button class="chip" onclick="setConfFilter('high',this)">High</button>
-      <button class="chip" onclick="setConfFilter('medhigh',this)">Med+</button>
-      <button class="chip rare-chip" id="rare-chip" onclick="toggleRare(this)">🔴 Rare only</button>
-    </div>
-  </div>
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('feed',this)">Feed</button>
-    <button class="tab-btn" onclick="switchTab('species',this)">Species</button>
-    <button class="tab-btn" onclick="switchTab('activity',this)">Activity</button>
-    <button class="tab-btn" onclick="switchTab('camera',this)">📷 Camera</button>
-  </div>
-  <div class="tab-pane active" id="tab-feed">
-    <div class="view-toggle">
-      <button class="view-btn active" id="vbtn-grouped" onclick="setFeedView('grouped',this)">By Species</button>
-      <button class="view-btn" id="vbtn-all" onclick="setFeedView('all',this)">All Detections</button>
-    </div>
-    <div id="feed-content"></div>
-    <div class="load-more-row"><button class="load-more-btn" id="more-btn" onclick="loadMore()">Load more</button></div>
-  </div>
-  <div class="tab-pane" id="tab-species"><div class="sp-list" id="sp-list"></div></div>
-  <div class="tab-pane" id="tab-activity">
-    <div class="chart-section">
-      <div class="chart-title">Activity by Hour of Day</div>
-      <div class="timeline-wrap"><div class="timeline-chart" id="hourly-chart"></div></div>
-    </div>
-    <div class="chart-section">
-      <div class="chart-title">Top Species</div>
-      <div class="hbar-chart" id="top-sp-chart"></div>
+      <div><div class="botd-count" id="botd-count">0</div><div class="botd-count-lbl">detections<br><span id="botd-period">today</span></div></div>
     </div>
   </div>
 
-  <!-- CAMERA TAB -->
+  <div class="section-header">
+    <span class="section-title">Recent Sightings</span>
+    <span class="section-sub" id="recent-sub"></span>
+  </div>
+  <div class="recent-scroll" id="recent-scroll"></div>
+
+  <div class="filter-bar">
+    <button class="chip" onclick="setTime('1h',this)">1h</button>
+    <button class="chip" onclick="setTime('12h',this)">12h</button>
+    <button class="chip active" onclick="setTime('24h',this)">24h</button>
+    <button class="chip" onclick="setTime('week',this)">Week</button>
+    <button class="chip" onclick="setTime('month',this)">Month</button>
+    <button class="chip" onclick="setTime('year',this)">Year</button>
+    <button class="chip" onclick="setTime('all',this)">All</button>
+    <button class="chip" id="cal-chip" onclick="openCal()">📅 Date</button>
+    <div class="filter-sep"></div>
+    <button class="chip active" onclick="setConf('all',this)">All conf</button>
+    <button class="chip" onclick="setConf('high',this)">High</button>
+    <button class="chip" onclick="setConf('med',this)">Med+</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('activity',this)">Activity</button>
+    <button class="tab-btn" onclick="switchTab('species',this)">Species</button>
+    <button class="tab-btn" onclick="switchTab('feed',this)">Feed</button>
+    <button class="tab-btn" onclick="switchTab('camera',this)">📷 Camera</button>
+  </div>
+
+  <div class="tab-pane active" id="tab-activity">
+    <div class="chart-card">
+      <div class="chart-title">Activity by Hour of Day <span class="chart-hint">— tap a bar for species breakdown</span></div>
+      <div class="hourly-wrap"><div class="hourly-chart" id="hourly-chart"></div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Detection Heatmap <span class="chart-hint">— tap a day to filter</span></div>
+      <div id="heatmap-container"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Top Species</div>
+      <div class="sp-bars" id="top-sp"></div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="tab-species">
+    <div class="sp-list-wrap" id="sp-list"></div>
+  </div>
+
+  <div class="tab-pane" id="tab-feed">
+    <div class="feed-wrap" id="feed-list"></div>
+    <div class="load-more-wrap" id="load-more-wrap" style="display:none">
+      <button class="load-more-btn" onclick="loadMoreFeed()">Load more</button>
+    </div>
+  </div>
+
   <div class="tab-pane" id="tab-camera">
     <div style="padding:12px 20px 6px;display:flex;align-items:center;justify-content:space-between">
       <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss)">Visual Detections</div>
-      <button class="refresh-btn" onclick="loadCameraDetections()" style="font-size:0.6rem">↻ Refresh</button>
+      <button class="refresh-btn" onclick="loadCamera()" style="font-size:0.6rem">↻ Refresh</button>
     </div>
-    <div class="stats-row" style="padding:0 20px 10px">
-      <div class="stat-card"><div class="stat-label">Species</div><div class="stat-value" id="cam-species">—</div><div class="stat-sub">today</div></div>
-      <div class="stat-card"><div class="stat-label">Sightings</div><div class="stat-value" id="cam-sightings">—</div><div class="stat-sub">today</div></div>
-      <div class="stat-card"><div class="stat-label">Camera</div><div class="stat-value" style="font-size:0.75rem;padding-top:6px">Pam &amp; Hugo</div><div class="stat-sub">Nevada County</div></div>
+    <div class="cam-stats">
+      <div class="stat-mini"><div class="lbl">Species</div><div class="val" id="cam-sp">—</div></div>
+      <div class="stat-mini"><div class="lbl">Sightings</div><div class="val" id="cam-ct">—</div></div>
+      <div class="stat-mini"><div class="lbl">Camera</div><div class="val" style="font-size:0.75rem;padding-top:6px">Sony A1</div></div>
     </div>
-    <div id="cam-feed" style="padding:0 20px"></div>
-    <div id="cam-loading" class="loading-msg" style="display:none">
-      <div class="loading-dots"><span>·</span><span>·</span><span>·</span></div>
+    <div id="cam-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
+    <div class="cam-grid" id="cam-feed"></div>
+  </div>
+</div>
+
+<!-- HOUR BOTTOM SHEET -->
+<div class="bottom-overlay" id="hour-overlay" onclick="closeHourSheet()"></div>
+<div class="bottom-sheet" id="hour-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-hdr">
+    <div class="sheet-title" id="hour-title"></div>
+    <div class="sheet-sub" id="hour-sub"></div>
+  </div>
+  <div class="sheet-body sp-bars" id="hour-body"></div>
+</div>
+
+<!-- SPECIES PANEL -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="sp-panel" id="sp-panel">
+  <div class="panel-hdr">
+    <button class="panel-back" onclick="closePanel()">← Back</button>
+    <div class="panel-name" id="panel-name"></div>
+    <div class="panel-sci" id="panel-sci"></div>
+    <div class="panel-links" id="panel-links"></div>
+    <div class="panel-badges" id="panel-badges"></div>
+    <div id="panel-rare"></div>
+  </div>
+  <div class="panel-section">
+    <div class="panel-sec-title">Peak Activity — Hour of Day</div>
+    <div class="peak-chart" id="panel-peak"></div>
+    <div class="peak-lbl"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span></div>
+  </div>
+  <div class="panel-section">
+    <div class="panel-sec-title">Your Detections / Day (monthly avg)</div>
+    <div class="seasonal-wrap"><div class="seasonal-bars" id="my-seasonal"></div></div>
+  </div>
+  <div class="panel-section">
+    <div class="panel-sec-title">eBird Nevada County — % of Checklists</div>
+    <div class="panel-sec-sub" id="eb-sub">Loading…</div>
+    <div class="seasonal-wrap"><div class="seasonal-bars" id="eb-seasonal"></div></div>
+  </div>
+  <div class="panel-section" style="padding-bottom:24px">
+    <div class="panel-sec-title">Detection History</div>
+    <div class="date-chip-row">
+      <button class="date-chip" onclick="setPanelFilter('1h',this)">1h</button>
+      <button class="date-chip" onclick="setPanelFilter('12h',this)">12h</button>
+      <button class="date-chip" onclick="setPanelFilter('24h',this)">24h</button>
+      <button class="date-chip active" onclick="setPanelFilter('week',this)">Week</button>
+      <button class="date-chip" onclick="setPanelFilter('month',this)">Month</button>
+      <button class="date-chip" onclick="setPanelFilter('all',this)">All</button>
     </div>
+    <div id="panel-hist"></div>
   </div>
 </div>
 
 <!-- CALENDAR -->
-<div class="cal-overlay" id="cal-overlay" onclick="handleCalOverlayClick(event)">
+<div class="cal-overlay" id="cal-overlay" onclick="handleCalClick(event)">
   <div class="cal-box" id="cal-box">
     <div class="cal-header">
       <button class="cal-nav" onclick="calNav(-1)">‹</button>
@@ -286,45 +406,10 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div class="cal-dow">Su</div><div class="cal-dow">Mo</div><div class="cal-dow">Tu</div>
       <div class="cal-dow">We</div><div class="cal-dow">Th</div><div class="cal-dow">Fr</div><div class="cal-dow">Sa</div>
     </div>
-    <button class="cal-clear" onclick="clearCalFilter()">Clear date filter</button>
+    <button class="cal-clear" onclick="clearCal()">Clear date filter</button>
   </div>
 </div>
 
-<!-- PANEL -->
-<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
-<div class="panel" id="species-panel">
-  <div class="panel-header">
-    <button class="panel-back" onclick="closePanel()">← Back</button>
-    <div class="panel-name" id="panel-name"></div>
-    <div class="panel-sci" id="panel-sci"></div>
-    <div class="panel-links" id="panel-links"></div>
-    <div class="panel-badges" id="panel-badges"></div>
-    <div id="panel-rare-box"></div>
-  </div>
-  <div class="panel-section">
-    <div class="panel-section-title">Your Detections / Day</div>
-    <div class="panel-section-sub">Monthly average at Pam &amp; Hugo (active days only)</div>
-    <div class="seasonal-wrap"><div class="seasonal-bars" id="my-seasonal"></div></div>
-  </div>
-  <div class="panel-section">
-    <div class="panel-section-title">eBird Nevada County — % of Checklists</div>
-    <div class="panel-section-sub" id="eb-sub">Loading eBird data…</div>
-    <div class="seasonal-wrap"><div class="seasonal-bars" id="eb-seasonal"></div></div>
-  </div>
-  <div class="panel-section" style="padding-bottom:24px">
-    <div class="panel-section-title">Detection History</div>
-    <div class="date-filter">
-      <button class="date-chip" onclick="setPanelFilter('1h',this)">1h</button>
-      <button class="date-chip" onclick="setPanelFilter('12h',this)">12h</button>
-      <button class="date-chip" onclick="setPanelFilter('24h',this)">24h</button>
-      <button class="date-chip active" onclick="setPanelFilter('week',this)">Week</button>
-      <button class="date-chip" onclick="setPanelFilter('month',this)">Month</button>
-      <button class="date-chip" onclick="setPanelFilter('year',this)">Year</button>
-      <button class="date-chip" onclick="setPanelFilter('all',this)">All</button>
-    </div>
-    <div id="panel-hist-list"></div>
-  </div>
-</div>
 <footer>Pam &amp; Hugo Bird Station · BirdNET / Haikubox · eBird Nevada County CA</footer>
 
 <script>
@@ -334,16 +419,14 @@ const EBIRD_KEY='ekcngbuc33mk';
 const EBIRD_REGION='US-CA-057';
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// eBird species codes
 const CODES={
   "Spotted Towhee":"spotow","Acorn Woodpecker":"acowoo","Steller's Jay":"stejay",
   "Anna's Hummingbird":"annhum","Dark-eyed Junco":"daejun","Oak Titmouse":"oaktit",
   "Nuttall's Woodpecker":"nutwoo","Downy Woodpecker":"dowwoo","White-breasted Nuthatch":"wbnutha",
   "American Crow":"amecro","American Robin":"amerob","Black-headed Grosbeak":"bkhgro",
   "Cedar Waxwing":"cedwax","Song Sparrow":"sonspa","California Scrub-Jay":"cassja",
-  "Western Scrub-Jay":"cassja","Chestnut-backed Chickadee":"chbchi","House Finch":"houfin",
-  "Lesser Goldfinch":"lesgol","American Goldfinch":"amegol","Purple Finch":"purfin",
-  "Pine Siskin":"pinsis","Red-breasted Nuthatch":"rebnut","Brown Creeper":"brncre",
+  "Chestnut-backed Chickadee":"chbchi","House Finch":"houfin","Lesser Goldfinch":"lesgol",
+  "American Goldfinch":"amegol","Purple Finch":"purfin","Pine Siskin":"pinsis",
   "Hermit Thrush":"herthr","Varied Thrush":"varthr","Ruby-crowned Kinglet":"rucrki",
   "Golden-crowned Kinglet":"golcki","Yellow-rumped Warbler":"yerwar","Wilson's Warbler":"wilwar",
   "Orange-crowned Warbler":"orcwar","Bewick's Wren":"bewwre","Pacific Wren":"pacwre",
@@ -351,108 +434,85 @@ const CODES={
   "Red-tailed Hawk":"rethaw","Northern Flicker":"norfli","Hairy Woodpecker":"haiwoo",
   "Mourning Dove":"moudov","Wild Turkey":"wiltur","California Quail":"calqua",
   "Brown-headed Cowbird":"bnhcow","Western Wood-Pewee":"wewpew","Ash-throated Flycatcher":"astfly",
-  "Pacific-slope Flycatcher":"pasfly","Cooper's Hawk":"coohaw","Pileated Woodpecker":"pilwoo",
-  "Mountain Chickadee":"mouchi","Cassin's Vireo":"casvir","Black-capped Chickadee":"bkcchi",
-  "Western Bluebird":"wesblu","Common Raven":"comrav","Bushtit":"bushti",
-  "Townsend's Warbler":"towwar","Western Tanager":"westan","Bullock's Oriole":"bulori",
-  "Lazuli Bunting":"lazbun","House Wren":"houwre","Blue-gray Gnatcatcher":"blggna",
-  "Chipping Sparrow":"chispa","White-crowned Sparrow":"whcspa","Golden-crowned Sparrow":"gocspa",
-  "Fox Sparrow":"foxspa","Evening Grosbeak":"evegro","Cassin's Finch":"casfin",
-  "Black-throated Gray Warbler":"btgwar","Common Yellowthroat":"comyel","Yellow Warbler":"yelwar",
-  "Barn Swallow":"barswa","Cliff Swallow":"cliswa","Tree Swallow":"treswa",
-  "Violet-green Swallow":"vigswa","American Kestrel":"amekes","Common Merganser":"commer",
-  "Belted Kingfisher":"belkin","Osprey":"osprey","Bald Eagle":"baleag",
-  "Black-chinned Hummingbird":"bkchum","Calliope Hummingbird":"calhum","Allen's Hummingbird":"allhum",
-  "Rufous Hummingbird":"rufhum","Band-tailed Pigeon":"batpig","Mountain Quail":"mouqua",
-  "Clark's Nutcracker":"clnuth","White-headed Woodpecker":"whhwoo","Black-backed Woodpecker":"blbwoo",
-  "Dusky Flycatcher":"dusfly","Hammond's Flycatcher":"hamfly","Western Kingbird":"weskin",
-  "Brewer's Blackbird":"brebla","Brewer's Sparrow":"brespa","Lark Sparrow":"larspa",
-  "Nashville Warbler":"naswar","MacGillivray's Warbler":"macwar","Hermit Warbler":"herwar",
+  "Cooper's Hawk":"coohaw","Western Bluebird":"wesblu","Common Raven":"comrav",
+  "Bushtit":"bushti","Townsend's Warbler":"towwar","Western Tanager":"westan",
+  "Lazuli Bunting":"lazbun","House Wren":"houwre","Chipping Sparrow":"chispa",
+  "White-crowned Sparrow":"whcspa","Golden-crowned Sparrow":"gocspa","Fox Sparrow":"foxspa",
+  "Evening Grosbeak":"evegro","Black-headed Grosbeak":"bkhgro","Cassin's Vireo":"casvir",
+  "Mountain Chickadee":"mouchi","Clark's Nutcracker":"clnuth","Band-tailed Pigeon":"batpig",
+  "Allen's Hummingbird":"allhum","American Kestrel":"amekes","Bald Eagle":"baleag",
 };
 
-// Hardcoded eBird monthly frequency (% of checklists) Nevada County
-// Used as fallback and for chart display
 const EBIRD_FREQ={
-  "Spotted Towhee":         [45,52,60,65,68,62,58,55,60,58,50,42],
-  "Acorn Woodpecker":       [70,72,74,76,74,72,70,70,72,74,72,70],
-  "Steller's Jay":          [55,55,58,55,52,50,48,50,52,55,58,55],
-  "Anna's Hummingbird":     [48,52,58,62,60,55,52,50,52,55,52,48],
-  "Dark-eyed Junco":        [65,62,58,45,25,8,5,5,18,42,62,68],
-  "Oak Titmouse":           [55,56,58,60,58,56,54,54,56,58,56,54],
-  "Nuttall's Woodpecker":   [52,54,56,58,56,54,52,52,54,56,54,52],
-  "Downy Woodpecker":       [38,40,42,44,42,40,38,38,40,42,40,38],
+  "Spotted Towhee":[45,52,60,65,68,62,58,55,60,58,50,42],
+  "Acorn Woodpecker":[70,72,74,76,74,72,70,70,72,74,72,70],
+  "Steller's Jay":[55,55,58,55,52,50,48,50,52,55,58,55],
+  "Anna's Hummingbird":[48,52,58,62,60,55,52,50,52,55,52,48],
+  "Dark-eyed Junco":[65,62,58,45,25,8,5,5,18,42,62,68],
+  "Oak Titmouse":[55,56,58,60,58,56,54,54,56,58,56,54],
+  "Nuttall's Woodpecker":[52,54,56,58,56,54,52,52,54,56,54,52],
+  "Downy Woodpecker":[38,40,42,44,42,40,38,38,40,42,40,38],
   "White-breasted Nuthatch":[42,44,46,48,46,44,42,42,44,46,44,42],
-  "American Crow":          [50,52,54,55,52,50,48,48,50,52,52,50],
-  "American Robin":         [40,42,48,52,50,42,35,32,35,40,42,40],
-  "Black-headed Grosbeak":  [0,0,2,25,55,60,55,45,20,2,0,0],
-  "Cedar Waxwing":          [15,18,20,15,10,8,5,8,15,20,22,18],
-  "Song Sparrow":           [38,40,42,44,44,42,40,40,42,42,40,38],
-  "California Scrub-Jay":   [45,46,48,50,50,48,46,46,48,50,48,45],
+  "American Crow":[50,52,54,55,52,50,48,48,50,52,52,50],
+  "American Robin":[40,42,48,52,50,42,35,32,35,40,42,40],
+  "Black-headed Grosbeak":[0,0,2,25,55,60,55,45,20,2,0,0],
+  "Cedar Waxwing":[15,18,20,15,10,8,5,8,15,20,22,18],
+  "Song Sparrow":[38,40,42,44,44,42,40,40,42,42,40,38],
+  "California Scrub-Jay":[45,46,48,50,50,48,46,46,48,50,48,45],
   "Chestnut-backed Chickadee":[30,32,34,36,34,32,30,30,32,34,32,30],
-  "House Finch":            [45,48,52,55,54,52,50,50,52,52,50,46],
-  "Lesser Goldfinch":       [35,38,42,48,52,52,50,48,46,42,38,34],
-  "American Goldfinch":     [20,22,24,28,30,28,25,22,22,24,22,20],
-  "Purple Finch":           [30,28,26,24,18,10,8,8,12,20,28,32],
-  "Pine Siskin":            [25,22,18,15,10,5,3,3,8,15,22,26],
-  "Red-breasted Nuthatch":  [20,18,15,12,8,5,4,5,10,15,18,22],
-  "Brown Creeper":          [22,20,18,15,10,6,4,4,8,14,20,22],
-  "Hermit Thrush":          [28,25,20,15,8,3,2,2,8,18,25,30],
-  "Varied Thrush":          [18,15,10,5,2,0,0,0,1,5,12,18],
-  "Ruby-crowned Kinglet":   [30,25,18,10,3,0,0,0,3,15,25,32],
-  "Golden-crowned Kinglet": [25,22,16,8,2,0,0,0,2,10,20,26],
-  "Yellow-rumped Warbler":  [35,30,25,18,8,2,1,1,5,18,28,35],
-  "Wilson's Warbler":       [0,0,2,15,25,8,2,2,8,12,2,0],
-  "Orange-crowned Warbler": [5,5,8,20,18,10,6,6,10,12,6,5],
-  "Bewick's Wren":          [35,38,40,42,40,38,36,36,38,40,38,35],
-  "Pacific Wren":           [18,16,14,10,6,4,3,3,5,10,14,18],
-  "Hutton's Vireo":         [22,24,26,28,26,24,22,22,24,26,24,22],
-  "Black Phoebe":           [38,40,42,44,42,40,38,38,40,42,40,38],
-  "Turkey Vulture":         [5,8,15,28,35,38,36,35,30,20,10,5],
-  "Red-tailed Hawk":        [38,40,42,44,42,40,38,38,40,42,40,38],
-  "Northern Flicker":       [35,36,38,38,35,30,28,28,32,35,36,35],
-  "Hairy Woodpecker":       [22,22,24,24,22,20,18,18,20,22,22,22],
-  "Mourning Dove":          [30,32,35,38,38,36,34,34,36,36,34,30],
-  "Wild Turkey":            [15,16,18,20,20,18,16,16,18,18,16,15],
-  "California Quail":       [35,36,38,40,40,38,36,36,38,38,36,34],
-  "Brown-headed Cowbird":   [2,4,8,18,22,20,16,12,8,4,2,2],
-  "Western Wood-Pewee":     [0,0,0,5,18,25,22,18,10,2,0,0],
-  "Ash-throated Flycatcher":[0,0,0,8,18,20,18,14,8,2,0,0],
-  "Pacific-slope Flycatcher":[0,0,1,10,20,22,18,15,8,2,0,0],
-  "Pileated Woodpecker":    [12,12,13,14,13,12,11,11,12,13,12,12],
-  "Western Tanager":        [0,0,1,10,25,22,15,10,5,1,0,0],
-  "Black-headed Grosbeak":  [0,0,2,25,55,60,55,45,20,2,0,0],
-  "Bullock's Oriole":       [0,0,1,12,25,22,18,12,6,1,0,0],
-  "Lazuli Bunting":         [0,0,1,8,20,18,14,10,5,1,0,0],
-  "Cassin's Vireo":         [0,0,2,18,22,18,12,10,12,6,0,0],
-  "Mountain Chickadee":     [25,26,28,28,26,24,22,22,24,26,26,25],
-  "Western Bluebird":       [30,32,35,38,38,36,34,34,36,36,34,30],
-  "Common Raven":           [35,36,38,40,38,36,34,34,36,38,36,34],
-  "Bushtit":                [38,40,42,44,42,40,38,38,40,42,40,38],
-  "Townsend's Warbler":     [12,10,8,4,1,0,0,0,1,5,10,12],
-  "Cassin's Finch":         [18,16,14,12,10,8,6,6,8,12,15,18],
-  "Black-throated Gray Warbler":[0,0,2,12,18,15,10,8,8,4,0,0],
-  "Nashville Warbler":      [0,0,2,15,20,10,5,5,8,8,1,0],
-  "Yellow Warbler":         [0,0,1,8,18,20,15,12,6,2,0,0],
-  "Hermit Warbler":         [0,0,2,10,18,15,10,8,6,3,0,0],
+  "House Finch":[45,48,52,55,54,52,50,50,52,52,50,46],
+  "Lesser Goldfinch":[35,38,42,48,52,52,50,48,46,42,38,34],
+  "Purple Finch":[30,28,26,24,18,10,8,8,12,20,28,32],
+  "Pine Siskin":[25,22,18,15,10,5,3,3,8,15,22,26],
+  "Hermit Thrush":[28,25,20,15,8,3,2,2,8,18,25,30],
+  "Varied Thrush":[18,15,10,5,2,0,0,0,1,5,12,18],
+  "Ruby-crowned Kinglet":[30,25,18,10,3,0,0,0,3,15,25,32],
+  "Yellow-rumped Warbler":[35,30,25,18,8,2,1,1,5,18,28,35],
+  "Wilson's Warbler":[0,0,2,15,25,8,2,2,8,12,2,0],
+  "Orange-crowned Warbler":[5,5,8,20,18,10,6,6,10,12,6,5],
+  "Bewick's Wren":[35,38,40,42,40,38,36,36,38,40,38,35],
+  "Pacific Wren":[18,16,14,10,6,4,3,3,5,10,14,18],
+  "Hutton's Vireo":[22,24,26,28,26,24,22,22,24,26,24,22],
+  "Black Phoebe":[38,40,42,44,42,40,38,38,40,42,40,38],
+  "Turkey Vulture":[5,8,15,28,35,38,36,35,30,20,10,5],
+  "Red-tailed Hawk":[38,40,42,44,42,40,38,38,40,42,40,38],
+  "Northern Flicker":[35,36,38,38,35,30,28,28,32,35,36,35],
+  "Hairy Woodpecker":[22,22,24,24,22,20,18,18,20,22,22,22],
+  "Mourning Dove":[30,32,35,38,38,36,34,34,36,36,34,30],
+  "Wild Turkey":[15,16,18,20,20,18,16,16,18,18,16,15],
+  "California Quail":[35,36,38,40,40,38,36,36,38,38,36,34],
+  "Brown-headed Cowbird":[2,4,8,18,22,20,16,12,8,4,2,2],
+  "Western Tanager":[0,0,1,10,25,22,15,10,5,1,0,0],
+  "Cassin's Vireo":[0,0,2,18,22,18,12,10,12,6,0,0],
+  "Western Bluebird":[30,32,35,38,38,36,34,34,36,36,34,30],
+  "Common Raven":[35,36,38,40,38,36,34,34,36,38,36,34],
+  "Bushtit":[38,40,42,44,42,40,38,38,40,42,40,38],
+  "Townsend's Warbler":[12,10,8,4,1,0,0,0,1,5,10,12],
+  "Evening Grosbeak":[18,16,14,12,10,8,6,6,8,12,15,18],
 };
 
-// STATE
-let allDetections=[],nextToken=null;
-let timeFilter='24h',confFilter='all',rareOnly=false,feedView='grouped';
-let panelSpecies=null,panelDateFilter='week';
-let currentlyPlaying=null,autoRefreshTimer=null;
-let currentMonthSpecies=new Set(); // species seen in Nevada County this month via eBird
+// === STATE ===
+let allDetections=[], nextToken=null, historyPromise=null;
+let timeFilter='24h', confFilter='all', calSelectedDate=null;
+let panelSpecies=null, panelDateFilter='week';
+let currentlyPlaying=null, autoRefreshTimer=null;
+let currentMonthSpecies=new Set();
+let feedPage=0; const FEED_PAGE_SIZE=60;
+let cameraLoaded=false;
+let activeTab='activity';
 
 const $=id=>document.getElementById(id);
 function setStatus(t,m){$('sdot').className='sdot '+t;$('stxt').textContent=m}
-function showError(m){$('err').innerHTML=`<div class="error-msg">⚠️ ${m}</div>`}
-function clearError(){$('err').innerHTML=''}
+function showErr(m){$('err').innerHTML=`<div class="error-msg">⚠️ ${m}</div>`}
+function clearErr(){$('err').innerHTML=''}
 function fmtTime(dt){return new Date(dt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 function fmtDate(dt){return new Date(dt).toLocaleDateString([],{month:'short',day:'numeric'})}
+function fmtHour(h){return h===0?'12a':h<12?h+'a':h===12?'12p':(h-12)+'p'}
 function confCls(s){return s>=0.85?'high':s>=0.65?'med':'low'}
-function passesConf(s){if(confFilter==='high')return s>=0.85;if(confFilter==='medhigh')return s>=0.65;return true}
+function passConf(s){if(confFilter==='high')return s>=0.85;if(confFilter==='med')return s>=0.65;return true}
+function isToday(dt){return new Date(dt).toDateString()===new Date().toDateString()}
 
-function cutoffFor(f){
+function cutoff(f){
   const n=new Date();
   if(f==='1h')return new Date(n-3600000);
   if(f==='12h')return new Date(n-43200000);
@@ -462,32 +522,21 @@ function cutoffFor(f){
   if(f==='year')return new Date(n.getFullYear(),0,1);
   return null;
 }
-function filterByTime(dets,f){const c=cutoffFor(f);return c?dets.filter(d=>new Date(d.dt)>=c):dets}
-function labelFor(f){return{'1h':'last hour','12h':'last 12h','24h':'last 24h','week':'this week','month':'this month','year':'this year','all':'all time'}[f]||f}
-
-// Rarity: if eBird has data AND species not in current month list → rare
-// Fallback: use frequency data < 10% for current month
+function filterByTime(dets,f){
+  if(f&&f.startsWith('day:')){const d=f.slice(4);return dets.filter(x=>new Date(x.dt).toISOString().slice(0,10)===d)}
+  const c=cutoff(f);return c?dets.filter(x=>new Date(x.dt)>=c):dets;
+}
+function labelFor(f){
+  if(f&&f.startsWith('day:')){const d=new Date(f.slice(4)+'T12:00');return d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'})}
+  return{'1h':'last hour','12h':'last 12h','24h':'last 24h','week':'this week','month':'this month','year':'this year','all':'all time'}[f]||f;
+}
 function isRare(cn){
-  if(currentMonthSpecies.size>0) return !currentMonthSpecies.has(cn);
-  const freq=EBIRD_FREQ[cn];
-  if(!freq) return false;
+  if(currentMonthSpecies.size>0)return !currentMonthSpecies.has(cn);
+  const freq=EBIRD_FREQ[cn];if(!freq)return false;
   return freq[new Date().getMonth()]<10;
 }
 
-// Load eBird current month species
-async function loadEbirdCurrentMonth(){
-  try{
-    const resp=await fetch(
-      `https://api.ebird.org/v2/data/obs/${EBIRD_REGION}/recent?maxResults=10000&back=30`,
-      {headers:{'X-eBirdApiToken':EBIRD_KEY}}
-    );
-    if(!resp.ok)return;
-    const data=await resp.json();
-    data.forEach(d=>currentMonthSpecies.add(d.comName));
-  }catch(e){console.log('eBird load failed',e)}
-}
-
-// API
+// === DATA LOADING ===
 async function gql(query,vars={}){
   const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,variables:vars})});
   const d=await res.json();
@@ -496,147 +545,313 @@ async function gql(query,vars={}){
 }
 async function getAudioUrl(p){const d=await gql('query($p:String!){getAudioUrl(audioPath:$p)}',{p});return d.getAudioUrl}
 
-// INIT
-async function fetchAllDetections(){
-  allDetections=[];
-  nextToken=null;
-  let page=0;
-  while(true){
-    const q=nextToken
-      ?`query($nt:String){hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100,nextToken:$nt){items{id dt cn sn score wav}nextToken}}`
-      :`query{hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100){items{id dt cn sn score wav}nextToken}}`;
-    const data=await gql(q,nextToken?{nt:nextToken}:{});
-    const batch=data.hitBySerialByDate.items;
-    allDetections=[...allDetections,...batch];
-    nextToken=data.hitBySerialByDate.nextToken;
-    page++;
-    setStatus('','Loading… '+allDetections.length+' detections');
-    if(!nextToken||page>=20)break;
+async function fetchRecent(){
+  const q=`query{hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100){items{id dt cn sn score wav}nextToken}}`;
+  const data=await gql(q);
+  allDetections=data.hitBySerialByDate.items;
+  nextToken=data.hitBySerialByDate.nextToken;
+}
+
+async function fetchNextPage(){
+  if(!nextToken)return false;
+  const q=`query($nt:String){hitBySerialByDate(serial:"${SERIAL}",sortDirection:DESC,limit:100,nextToken:$nt){items{id dt cn sn score wav}nextToken}}`;
+  const data=await gql(q,{nt:nextToken});
+  allDetections=[...allDetections,...data.hitBySerialByDate.items];
+  nextToken=data.hitBySerialByDate.nextToken;
+  return !!nextToken;
+}
+
+function ensureHistory(){
+  if(!historyPromise){
+    historyPromise=(async()=>{
+      let more=true,page=0;
+      while(more&&page<20){more=await fetchNextPage();page++;}
+    })();
   }
+  return historyPromise;
 }
 
-async function init(){
-  clearError();
-  $('loading').style.display='block';
-  $('app').style.display='none';
-  setStatus('','Connecting…');
-  await Promise.all([
-    loadEbirdCurrentMonth(),
-    fetchAllDetections()
-  ]).catch(e=>{throw e});
-  $('loading').style.display='none';
-  $('app').style.display='block';
-  buildAll();
-  setStatus('live',`Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${allDetections.length} detections`);
-  scheduleAutoRefresh();
+async function loadEbirdCurrentMonth(){
+  try{
+    const res=await fetch(`https://api.ebird.org/v2/data/obs/${EBIRD_REGION}/recent?maxResults=10000&back=30`,{headers:{'X-eBirdApiToken':EBIRD_KEY}});
+    if(!res.ok)return;
+    const data=await res.json();
+    data.forEach(d=>currentMonthSpecies.add(d.comName));
+  }catch(e){}
 }
 
-// Auto-refresh every 2 minutes, but never interrupt the user:
-// if audio is playing or the species panel is open, wait and retry shortly.
-function scheduleAutoRefresh(){
-  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
-  autoRefreshTimer=setTimeout(()=>{
-    const busy=currentlyPlaying||$('species-panel').classList.contains('open')||$('cal-overlay').classList.contains('open');
-    if(busy){ autoRefreshTimer=setTimeout(scheduleAutoRefresh,15000); return; }
-    init();
-  },120000);
+// === FILTERED DATA ===
+function filteredDets(){
+  return filterByTime(allDetections,timeFilter).filter(d=>passConf(d.score));
 }
 
-async function loadMore(){
-  // No-op: all detections loaded on init
+// === STREAK ===
+function calcStreak(){
+  const dates=new Set(allDetections.map(d=>new Date(d.dt).toDateString()));
+  let streak=0,d=new Date();d.setHours(0,0,0,0);
+  for(let i=0;i<365;i++){if(dates.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}else break;}
+  return streak;
 }
 
+// === BUILD ALL ===
 function buildAll(){
-  let f=filterByTime(allDetections,timeFilter).filter(d=>passesConf(d.score));
-  if(rareOnly)f=f.filter(d=>isRare(d.cn));
-  buildBotd(f);buildStats(f);buildFeed(f);buildSpeciesList(f);buildHourly(f);buildTopSp(f);
+  const f=filteredDets();
+  buildHero();
+  buildRecent();
+  buildBotd(f);
+  if(activeTab==='activity'){buildHourly(f);buildHeatmap();buildTopSp(f);}
+  if(activeTab==='species')buildSpeciesList(f);
+  if(activeTab==='feed'){feedPage=0;buildFeed(f);}
 }
 
+// === HERO ===
+function buildHero(){
+  const today=allDetections.filter(d=>isToday(d.dt));
+  $('h-species').textContent=new Set(today.map(d=>d.cn)).size||'—';
+  $('h-dets').textContent=today.length||'—';
+  const hrs=Array(24).fill(0);today.forEach(d=>hrs[new Date(d.dt).getHours()]++);
+  const peak=hrs.indexOf(Math.max(...hrs));
+  $('h-peak').textContent=today.length?fmtHour(peak):'—';
+  const streak=calcStreak();
+  $('h-streak').textContent=streak?streak+(streak===1?' day':' days'):'—';
+}
+
+// === BOTD ===
 function buildBotd(f){
-  const map={};f.forEach(d=>{if(!map[d.cn])map[d.cn]={name:d.cn,sci:d.sn,count:0};map[d.cn].count++});
+  const map={};f.forEach(d=>{if(!map[d.cn])map[d.cn]={name:d.cn,sci:d.sn,count:0};map[d.cn].count++;});
   const top=Object.values(map).sort((a,b)=>b.count-a.count)[0];
-  if(top){$('botd-name').textContent=top.name;$('botd-sci').textContent=top.sci;$('botd-count').textContent=top.count;$('botd').dataset.species=top.name}
-  else{$('botd-name').textContent='No detections in window';$('botd-sci').textContent='';$('botd-count').textContent='0';delete $('botd').dataset.species}
+  if(top){
+    $('botd-name').textContent=top.name;$('botd-sci').textContent=top.sci;
+    $('botd-count').textContent=top.count;$('botd').dataset.species=top.name;
+  }else{
+    $('botd-name').textContent='No detections';$('botd-sci').textContent='';
+    $('botd-count').textContent='0';delete $('botd').dataset.species;
+  }
   $('botd-period').textContent=labelFor(timeFilter);
 }
+function botdClick(){const n=$('botd').dataset.species;if(n)openSpecies(n);}
 
-function buildStats(f){
-  $('s-species').textContent=new Set(f.map(d=>d.cn)).size;
-  $('s-dets').textContent=f.length;
-  $('s-total').textContent=allDetections.length;
-}
-
-// FEED
-function buildFeed(f){feedView==='grouped'?buildGroupedFeed(f):buildAllFeed(f)}
-
-function buildGroupedFeed(f){
-  const map={};
-  f.forEach(d=>{if(!map[d.cn])map[d.cn]={name:d.cn,sci:d.sn,dets:[]};map[d.cn].dets.push(d)});
-  const groups=Object.values(map).sort((a,b)=>b.dets.length-a.dets.length);
-  if(!groups.length){$('feed-content').innerHTML=`<div class="empty-msg">No detections for ${labelFor(timeFilter)}</div>`;return}
-  $('feed-content').innerHTML=groups.map((g,gi)=>{
-    const first=g.dets[g.dets.length-1],last=g.dets[0];
-    const avgConf=g.dets.reduce((s,d)=>s+d.score,0)/g.dets.length;
-    const rare=isRare(g.name);
-    const rows=g.dets.map((d,i)=>{
-      const cl=confCls(d.score);
-      return `<div class="det-row" onclick="openSpecies('${d.cn.replace(/'/g,"\\'")}')">
-        <div class="det-row-left"><div class="det-meta"><span class="det-time">${fmtTime(d.dt)} · ${fmtDate(d.dt)}</span></div></div>
-        <div class="det-row-right">
-          <span class="conf-badge conf-${cl}">${Math.round(d.score*100)}%</span>
-          ${d.wav?`<button class="play-btn" id="pb-${gi}-${i}" onclick="event.stopPropagation();playAudio('${gi}-${i}','${d.wav.replace(/'/g,"\\'")}')">▶</button>`:''}
-        </div>
-      </div>`;
-    }).join('');
-    const firstStr=`${fmtTime(first.dt)} ${fmtDate(first.dt)}`;
-    const lastStr=first===last?'':` → ${fmtTime(last.dt)} ${fmtDate(last.dt)}`;
-    return `<div class="sp-group">
-      <div class="sp-group-header" onclick="toggleGroup(${gi})">
-        <div class="sp-group-info">
-          <div class="sp-group-name">${g.name}${rare?' <span class="rare-flag">Rare</span>':''}</div>
-          <div class="sp-group-meta">${firstStr}${lastStr}</div>
-        </div>
-        <div class="sp-group-right">
-          <span class="conf-badge conf-${confCls(avgConf)}">${Math.round(avgConf*100)}%</span>
-          <span class="sp-group-count">${g.dets.length}</span>
-          <span class="chevron" id="chev-${gi}">›</span>
-        </div>
+// === RECENT STRIP ===
+function buildRecent(){
+  const recent=allDetections.slice(0,8);
+  $('recent-sub').textContent=`last ${recent.length}`;
+  if(!recent.length){$('recent-scroll').innerHTML='<div class="empty-state" style="padding:12px 20px">No detections yet</div>';return;}
+  $('recent-scroll').innerHTML=recent.map(d=>{
+    const conf=Math.round(d.score*100);
+    const cls=confCls(d.score);
+    return `<div class="recent-card" onclick="openSpecies('${d.cn.replace(/'/g,"\\'")}')">
+      <div class="recent-thumb">🐦</div>
+      <div class="recent-info">
+        <div class="recent-name">${d.cn}</div>
+        <div class="recent-time">${fmtTime(d.dt)} · ${fmtDate(d.dt)}</div>
+        <span class="conf-badge conf-${cls}">${conf}%</span>
       </div>
-      <div class="sp-group-body" id="grp-${gi}">${rows}</div>
     </div>`;
   }).join('');
 }
 
-function toggleGroup(gi){
-  const body=$('grp-'+gi),chev=$('chev-'+gi);
-  const open=body.classList.toggle('open');
-  chev.classList.toggle('open',open);
+// === HOURLY CHART (clickable) ===
+function buildHourly(f){
+  const el=$('hourly-chart');
+  if(!f.length){el.innerHTML='<div class="empty-state" style="width:100%">No data</div>';return;}
+  const hrs=Array(24).fill(0);f.forEach(d=>hrs[new Date(d.dt).getHours()]++);
+  const max=Math.max(1,...hrs);
+  const colors=['#3d5a3e','#4a6e4b','#577e58','#5b8fa8','#6a9e6e','#7a9e7e'];
+  el.innerHTML=hrs.map((c,h)=>{
+    const lbl=fmtHour(h);
+    const barH=c>0?Math.max(2,Math.round(c/max*72)):0;
+    return `<div class="h-col" onclick="showHourDetail(${h})">
+      <div class="h-tip">${lbl}: ${c}</div>
+      <div class="h-val">${c>0?c:''}</div>
+      <div class="h-spacer"><div class="h-bar" style="height:${barH}px;background:${colors[h%colors.length]}"></div></div>
+      <div class="h-lbl">${lbl}</div>
+    </div>`;
+  }).join('');
 }
 
-function buildAllFeed(f){
-  if(!f.length){$('feed-content').innerHTML=`<div class="empty-msg">No detections for ${labelFor(timeFilter)}</div>`;return}
-  $('feed-content').innerHTML='<div class="det-list">'+f.slice(0,60).map((d,i)=>{
-    const cl=confCls(d.score);const rare=isRare(d.cn);
-    return `<div class="det-row" onclick="openSpecies('${d.cn.replace(/'/g,"\\'")}')">
-      <div class="det-row-left">
-        <div class="det-name">${d.cn}${rare?' <span class="rare-flag">Rare</span>':''}</div>
-        <div class="det-meta"><span class="det-time">${fmtTime(d.dt)} · ${fmtDate(d.dt)}</span><span class="det-sci">${d.sn}</span></div>
+// === HOUR DETAIL PANEL ===
+function showHourDetail(h){
+  const lbl=fmtHour(h);
+  const f=filteredDets().filter(d=>new Date(d.dt).getHours()===h);
+  const map={};f.forEach(d=>map[d.cn]=(map[d.cn]||0)+1);
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  $('hour-title').textContent=`${lbl} · ${f.length} detection${f.length!==1?'s':''}`;
+  $('hour-sub').textContent=`${sorted.length} species · ${labelFor(timeFilter)}`;
+  $('hour-body').innerHTML=sorted.length?sorted.map(([name,cnt])=>`
+    <div class="spbar-row" onclick="closeHourSheet();openSpecies('${name.replace(/'/g,"\\'")}')">
+      <div class="spbar-name">${name}${isRare(name)?'<span class="rare-flag" style="margin-left:5px">Rare</span>':''}</div>
+      <div class="spbar-track"><div class="spbar-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>
+      <div class="spbar-count">${cnt}</div>
+    </div>`).join(''):'<div class="empty-state">No detections this hour</div>';
+  $('hour-overlay').classList.add('open');
+  $('hour-sheet').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeHourSheet(){
+  $('hour-overlay').classList.remove('open');
+  $('hour-sheet').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// === HEATMAP ===
+function buildHeatmap(){
+  const counts={};
+  allDetections.forEach(d=>{
+    const k=new Date(d.dt).toISOString().slice(0,10);
+    counts[k]=(counts[k]||0)+1;
+  });
+  const today=new Date();today.setHours(0,0,0,0);
+  // Start on Sunday 52 weeks ago
+  const start=new Date(today);
+  start.setDate(start.getDate()-364-start.getDay());
+  const maxCount=Math.max(1,...Object.values(counts));
+  function cellColor(c){
+    if(!c)return '#ede8df';
+    const t=c/maxCount;
+    if(t<0.2)return '#b3cfb5';
+    if(t<0.4)return '#7a9e7e';
+    if(t<0.7)return '#577e58';
+    return '#3d5a3e';
+  }
+  // Build weeks array
+  const weeks=[];
+  const d=new Date(start);
+  let monthLabel=[];
+  for(let w=0;w<53;w++){
+    const week=[];
+    for(let day=0;day<7;day++){
+      const iso=d.toISOString().slice(0,10);
+      week.push({iso,count:counts[iso]||0,future:d>today,month:d.getMonth(),day:d.getDate()});
+      if(day===0){monthLabel.push({w,m:d.getMonth(),yr:d.getFullYear()});}
+      d.setDate(d.getDate()+1);
+    }
+    weeks.push(week);
+  }
+  // Deduplicate month labels (show each month once)
+  const shownMonths=new Set();
+  const mLabels=monthLabel.map(({w,m,yr})=>{
+    const key=`${yr}-${m}`;
+    if(shownMonths.has(key))return {w,label:''};
+    shownMonths.add(key);
+    return {w,label:MONTHS[m]};
+  });
+  const CELL=11,GAP=2,STEP=CELL+GAP;
+  // Month label row
+  const monthsHtml=mLabels.map(({label})=>
+    `<div class="month-lbl-slot" style="width:${STEP}px;flex-shrink:0">${label}</div>`
+  ).join('');
+  // Week columns
+  const weeksHtml=weeks.map(week=>`
+    <div class="heatmap-week">
+      ${week.map(({iso,count,future,month,day})=>future?
+        `<div class="h-cell future" style="width:${CELL}px;height:${CELL}px"></div>`:
+        `<div class="h-cell" style="width:${CELL}px;height:${CELL}px;background:${cellColor(count)}" title="${iso}: ${count} detections" onclick="selectDay('${iso}')"></div>`
+      ).join('')}
+    </div>`).join('');
+  const dowHtml=['S','M','T','W','T','F','S'].map(l=>`<div class="dow-lbl">${l}</div>`).join('');
+  $('heatmap-container').innerHTML=`
+    <div class="heatmap-outer">
+      <div style="display:flex">
+        <div style="width:20px;flex-shrink:0"></div>
+        <div style="display:flex;gap:${GAP}px;flex-shrink:0">${monthsHtml}</div>
       </div>
-      <div class="det-row-right">
-        <span class="conf-badge conf-${cl}">${Math.round(d.score*100)}%</span>
+      <div style="display:flex">
+        <div class="heatmap-dow">${dowHtml}</div>
+        <div class="heatmap-cols">${weeksHtml}</div>
+      </div>
+    </div>`;
+}
+function selectDay(iso){
+  calSelectedDate=iso;timeFilter='day:'+iso;
+  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
+  const d=new Date(iso+'T12:00');
+  $('cal-chip').textContent='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
+  $('cal-chip').classList.add('active');
+  buildAll();
+}
+
+// === TOP SPECIES ===
+function buildTopSp(f){
+  const map={};f.forEach(d=>map[d.cn]=(map[d.cn]||0)+1);
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const max=sorted[0]?.[1]||1;
+  $('top-sp').innerHTML=sorted.length?sorted.map(([name,cnt])=>`
+    <div class="spbar-row" onclick="openSpecies('${name.replace(/'/g,"\\'")}')">
+      <div class="spbar-name">${name}</div>
+      <div class="spbar-track"><div class="spbar-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>
+      <div class="spbar-count">${cnt}</div>
+    </div>`).join(''):'<div class="empty-state">No data</div>';
+}
+
+// === SPECIES LIST ===
+function buildSpeciesList(f){
+  const map={};
+  f.forEach(d=>{
+    if(!map[d.cn])map[d.cn]={name:d.cn,sci:d.sn,count:0,scores:[]};
+    map[d.cn].count++;map[d.cn].scores.push(d.score);
+  });
+  const rows=Object.values(map).sort((a,b)=>b.count-a.count);
+  if(!rows.length){$('sp-list').innerHTML=`<div class="empty-state">No detections for ${labelFor(timeFilter)}</div>`;return;}
+  $('sp-list').innerHTML=rows.map(r=>{
+    const avg=r.scores.reduce((s,x)=>s+x,0)/r.scores.length;
+    const rare=isRare(r.name);
+    // Daily avg
+    const days=new Set(f.filter(d=>d.cn===r.name).map(d=>new Date(d.dt).toDateString()));
+    const perDay=days.size>0?(r.count/days.size).toFixed(1):r.count;
+    // Peak hour for this species
+    const hrs=Array(24).fill(0);f.filter(d=>d.cn===r.name).forEach(d=>hrs[new Date(d.dt).getHours()]++);
+    const peak=hrs.indexOf(Math.max(...hrs));
+    const peakLbl=r.count>0?`peak ${fmtHour(peak)}`:'';
+    return `<div class="sp-row" onclick="openSpecies('${r.name.replace(/'/g,"\\'")}')">
+      <div class="sp-info">
+        <div class="sp-name">${r.name}${rare?'<span class="rare-flag" style="margin-left:6px">Rare</span>':''}</div>
+        <div class="sp-sci">${r.sci}</div>
+        <div class="sp-meta">${perDay}/day avg · ${peakLbl} · ${Math.round(avg*100)}% avg conf</div>
+      </div>
+      <div class="sp-right">
+        <span class="sp-count">${r.count}</span>
+        <span class="chevron">›</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// === FEED ===
+function buildFeed(f){
+  feedPage=0;
+  renderFeedPage(f);
+}
+function renderFeedPage(f){
+  const slice=f.slice(0,FEED_PAGE_SIZE*(feedPage+1));
+  if(!slice.length){$('feed-list').innerHTML=`<div class="empty-state">No detections for ${labelFor(timeFilter)}</div>`;$('load-more-wrap').style.display='none';return;}
+  $('feed-list').innerHTML=slice.map((d,i)=>{
+    const cls=confCls(d.score);const rare=isRare(d.cn);
+    return `<div class="det-row" onclick="openSpecies('${d.cn.replace(/'/g,"\\'")}')">
+      <div class="det-left">
+        <div class="det-name">${d.cn}${rare?'<span class="rare-flag" style="margin-left:6px">Rare</span>':''}</div>
+        <div class="det-meta">
+          <span class="det-time">${fmtTime(d.dt)} · ${fmtDate(d.dt)}</span>
+          <span class="det-sci">${d.sn}</span>
+        </div>
+      </div>
+      <div class="det-right">
+        <span class="conf-badge conf-${cls}">${Math.round(d.score*100)}%</span>
         ${d.wav?`<button class="play-btn" id="pb-${i}" onclick="event.stopPropagation();playAudio(${i},'${d.wav.replace(/'/g,"\\'")}')">▶</button>`:''}
         <span class="chevron">›</span>
       </div>
     </div>`;
-  }).join('')+'</div>';
+  }).join('');
+  $('load-more-wrap').style.display=slice.length<f.length?'block':'none';
 }
+function loadMoreFeed(){feedPage++;renderFeedPage(filteredDets());}
 
-async function playAudio(idx,wavPath){
+// === AUDIO ===
+async function playAudio(idx,wav){
   const btn=$('pb-'+idx);if(!btn)return;
   if(currentlyPlaying&&currentlyPlaying.idx!==idx){
     currentlyPlaying.audio.pause();
-    const pb=$('pb-'+currentlyPlaying.idx);
-    if(pb){pb.textContent='▶';pb.classList.remove('playing')}
+    const pb=$('pb-'+currentlyPlaying.idx);if(pb){pb.textContent='▶';pb.classList.remove('playing');}
     currentlyPlaying=null;
   }
   if(currentlyPlaying&&currentlyPlaying.idx===idx){
@@ -644,93 +859,56 @@ async function playAudio(idx,wavPath){
   }
   btn.textContent='…';
   try{
-    const url=await getAudioUrl(wavPath);
+    const url=await getAudioUrl(wav);
     const audio=new Audio(url);
     btn.textContent='⏸';btn.classList.add('playing');
     currentlyPlaying={idx,audio};audio.play();
-    audio.onended=()=>{btn.textContent='▶';btn.classList.remove('playing');currentlyPlaying=null};
-  }catch(e){btn.textContent='▶'}
+    audio.onended=()=>{btn.textContent='▶';btn.classList.remove('playing');currentlyPlaying=null;};
+  }catch(e){btn.textContent='▶';}
 }
 
-function buildSpeciesList(f){
-  const map={};
-  f.forEach(d=>{if(!map[d.cn])map[d.cn]={name:d.cn,sci:d.sn,count:0,scoreSum:0};map[d.cn].count++;map[d.cn].scoreSum+=d.score});
-  const rows=Object.values(map).sort((a,b)=>b.count-a.count);
-  if(!rows.length){$('sp-list').innerHTML=`<div class="empty-msg">No detections for ${labelFor(timeFilter)}</div>`;return}
-  $('sp-list').innerHTML=rows.map(r=>{
-    const rare=isRare(r.name);
-    return `<div class="sp-row" onclick="openSpecies('${r.name.replace(/'/g,"\\'")}')">
-      <div class="sp-row-info">
-        <div class="sp-row-name">${r.name}${rare?' <span class="rare-flag">Rare</span>':''}</div>
-        <div class="sp-row-sci">${r.sci}</div>
-      </div>
-      <div class="sp-row-right"><span class="sp-count">${r.count}</span><span class="chevron">›</span></div>
-    </div>`;
-  }).join('');
-}
-
-function buildHourly(f){
-  if(!f.length){$('hourly-chart').innerHTML=`<div class="empty-msg" style="width:100%">No data for ${labelFor(timeFilter)}</div>`;return}
-  const hours=Array(24).fill(0);
-  f.forEach(d=>hours[new Date(d.dt).getHours()]++);
-  const max=Math.max(1,...hours);
-  const colors=['#3d5a3e','#4a6e4b','#577e58','#5b8fa8','#6a9e6e','#7a9e7e'];
-  $('hourly-chart').innerHTML=hours.map((c,h)=>{
-    const lbl=h===0?'12a':h<12?`${h}a`:h===12?'12p':`${h-12}p`;
-    const barH=c>0?Math.max(2,Math.round(c/max*72)):0;
-    return `<div class="tbar-col">
-      <div class="tbar-tip">${lbl}: ${c}</div>
-      <div class="tbar-val">${c>0?c:''}</div>
-      <div class="tbar-spacer"><div class="tbar" style="height:${barH}px;background:${colors[h%colors.length]}"></div></div>
-      <div class="tbar-lbl">${lbl}</div>
-    </div>`;
-  }).join('');
-}
-
-function buildTopSp(f){
-  const map={};f.forEach(d=>map[d.cn]=(map[d.cn]||0)+1);
-  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  if(!sorted.length){$('top-sp-chart').innerHTML=`<div class="empty-msg">No data for ${labelFor(timeFilter)}</div>`;return}
-  const max=sorted[0][1];
-  $('top-sp-chart').innerHTML=sorted.map(([name,cnt])=>`
-    <div class="hbar-row">
-      <div class="hbar-label" onclick="openSpecies('${name.replace(/'/g,"\\'")}')">${name}</div>
-      <div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>
-      <div class="hbar-count">${cnt}</div>
-    </div>`).join('');
-}
-
-// PANEL
+// === SPECIES PANEL ===
 async function openSpecies(cn){
   const dets=allDetections.filter(d=>d.cn===cn);
   if(!dets.length)return;
   panelSpecies=cn;panelDateFilter='week';
   document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.date-chip')[3].classList.add('active');
+  document.querySelectorAll('.date-chip')[3]?.classList.add('active');
   $('panel-name').textContent=cn;
   $('panel-sci').textContent=dets[0].sn;
   const code=CODES[cn];
   $('panel-links').innerHTML=
-    `<a class="ebird-link" href="https://ebird.org/species/${code||''}${code?'/'+EBIRD_REGION:''}" target="_blank">🐦 eBird Species</a>`+
+    `<a class="ebird-link" href="https://ebird.org/species/${code||''}${code?'/'+EBIRD_REGION:''}" target="_blank">🐦 eBird</a>`+
     (code?`<a class="ebird-link" href="https://ebird.org/map/${code}?region=${EBIRD_REGION}" target="_blank">🗺 Map</a>`:'');
-  const avgConf=dets.reduce((s,d)=>s+d.score,0)/dets.length;
+  const avg=dets.reduce((s,d)=>s+d.score,0)/dets.length;
+  const days=new Set(dets.map(d=>new Date(d.dt).toDateString()));
+  const perDay=(dets.length/Math.max(1,days.size)).toFixed(1);
+  // Peak hour
+  const hrs=Array(24).fill(0);dets.forEach(d=>hrs[new Date(d.dt).getHours()]++);
+  const peakH=hrs.indexOf(Math.max(...hrs));
   $('panel-badges').innerHTML=`
     <div class="panel-stat"><strong>${dets.length}</strong>total</div>
-    <div class="panel-stat"><strong>${Math.round(avgConf*100)}%</strong>avg conf</div>
+    <div class="panel-stat"><strong>${perDay}</strong>per active day</div>
+    <div class="panel-stat"><strong>${fmtHour(peakH)}</strong>peak hour</div>
+    <div class="panel-stat"><strong>${Math.round(avg*100)}%</strong>avg conf</div>
     <div class="panel-stat"><strong>${fmtDate(dets[dets.length-1].dt)}</strong>first seen</div>`;
-  const rare=isRare(cn);
-  $('panel-rare-box').innerHTML=rare
-    ?`<div class="panel-rare">⚠️ <strong>Rare for this time of year</strong> — not reported in eBird Nevada County checklists in the last 30 days.</div>`:'';
-  buildMySeasonalChart(cn);
-  buildEbirdSeasonalChart(cn);
-  buildPanelHist();
+  $('panel-rare').innerHTML=isRare(cn)?
+    `<div class="panel-rare-box">⚠️ <strong>Rare for this time of year</strong> — not in recent eBird Nevada County checklists.</div>`:'';
+  // Peak hour chart
+  const maxH=Math.max(1,...hrs);
+  $('panel-peak').innerHTML=hrs.map((c,h)=>`
+    <div class="peak-bar${h===peakH?' peak':''}" style="height:${Math.max(c>0?2:0,Math.round(c/maxH*40))}px;background:${h===peakH?'var(--moss)':'var(--sage)'};opacity:${c>0?0.85:0.15}"></div>`
+  ).join('');
+  buildMySeasonalChart(cn);buildEbirdSeasonalChart(cn);buildPanelHist();
   $('panel-overlay').classList.add('open');
-  $('species-panel').classList.add('open');
+  $('sp-panel').classList.add('open');
   document.body.style.overflow='hidden';
 }
-
-function openSpeciesFromBotd(){const name=$('botd').dataset.species;if(name)openSpecies(name)}
-function closePanel(){$('panel-overlay').classList.remove('open');$('species-panel').classList.remove('open');document.body.style.overflow=''}
+function closePanel(){
+  $('panel-overlay').classList.remove('open');
+  $('sp-panel').classList.remove('open');
+  document.body.style.overflow='';
+}
 
 function buildMySeasonalChart(cn){
   const counts=Array(12).fill(0),days=Array(12).fill(null).map(()=>new Set());
@@ -741,36 +919,26 @@ function buildMySeasonalChart(cn){
   const max=Math.max(0.01,...rate);
   const cur=new Date().getMonth();
   $('my-seasonal').innerHTML=rate.map((v,m)=>{
-    const h=Math.round(v/max*72);
-    const myH=Math.round(v/max*62);
+    const h=Math.max(v>0?2:0,Math.round(v/max*62));
     return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center">
-      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center;width:100%">${v>0?v.toFixed(1):''}</div>
-      <div style="flex:1;display:flex;align-items:flex-end;width:100%">
-        <div class="sbar sbar-my" style="height:${Math.max(myH,v>0?2:0)}px;width:100%" title="${MONTHS[m]}: ${v.toFixed(1)}/day"></div>
-      </div>
-      <div class="sbar-lbl" style="margin-top:3px">${MONTHS[m][0]}</div>
+      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center">${v>0?v.toFixed(1):''}</div>
+      <div style="flex:1;display:flex;align-items:flex-end;width:100%"><div class="sbar sbar-my" style="height:${h}px;width:100%"></div></div>
+      <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
 }
 
 function buildEbirdSeasonalChart(cn){
   const data=EBIRD_FREQ[cn];
-  if(!data){
-    $('eb-sub').textContent='No eBird frequency data for this species';
-    $('eb-seasonal').innerHTML='';return;
-  }
-  $('eb-sub').textContent='% of eBird checklists reporting this species (Nevada County)';
-  const max=Math.max(0.1,...data);
-  const cur=new Date().getMonth();
+  if(!data){$('eb-sub').textContent='No eBird data for this species';$('eb-seasonal').innerHTML='';return;}
+  $('eb-sub').textContent='% of eBird checklists reporting this species';
+  const max=Math.max(0.1,...data);const cur=new Date().getMonth();
   $('eb-seasonal').innerHTML=data.map((v,m)=>{
-    const h=Math.round(v/max*72);
-    const ebH=Math.round(v/max*62);
+    const h=Math.max(v>0?2:0,Math.round(v/max*62));
     return `<div class="sbar-col${m===cur?' sbar-cur':''}" style="display:flex;flex-direction:column;align-items:center">
-      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center;width:100%">${v>0?Math.round(v)+'%':''}</div>
-      <div style="flex:1;display:flex;align-items:flex-end;width:100%">
-        <div class="sbar sbar-eb" style="height:${Math.max(ebH,v>0?2:0)}px;width:100%" title="${MONTHS[m]}: ${v}%"></div>
-      </div>
-      <div class="sbar-lbl" style="margin-top:3px">${MONTHS[m][0]}</div>
+      <div style="font-size:0.38rem;color:${m===cur?'var(--dawn)':'rgba(26,26,20,0.5)'};height:12px;line-height:12px;text-align:center">${v>0?Math.round(v)+'%':''}</div>
+      <div style="flex:1;display:flex;align-items:flex-end;width:100%"><div class="sbar sbar-eb" style="height:${h}px;width:100%"></div></div>
+      <div class="sbar-lbl">${MONTHS[m][0]}</div>
     </div>`;
   }).join('');
 }
@@ -778,198 +946,169 @@ function buildEbirdSeasonalChart(cn){
 function buildPanelHist(){
   if(!panelSpecies)return;
   const dets=filterByTime(allDetections.filter(d=>d.cn===panelSpecies),panelDateFilter);
-  if(!dets.length){$('panel-hist-list').innerHTML=`<div class="empty-msg">No detections for ${labelFor(panelDateFilter)}</div>`;return}
-  $('panel-hist-list').innerHTML=dets.map((d,i)=>{
-    const cl=confCls(d.score);
+  if(!dets.length){$('panel-hist').innerHTML=`<div class="empty-state">No detections for ${labelFor(panelDateFilter)}</div>`;return;}
+  $('panel-hist').innerHTML=dets.map((d,i)=>{
+    const cls=confCls(d.score);
     return `<div class="hist-row">
       <div class="hist-time">${fmtTime(d.dt)}</div>
       <div class="hist-date">${fmtDate(d.dt)}</div>
       <div class="hist-right">
-        <span class="conf-badge conf-${cl}">${Math.round(d.score*100)}%</span>
+        <span class="conf-badge conf-${cls}">${Math.round(d.score*100)}%</span>
         ${d.wav?`<button class="play-btn" id="pb-h${i}" onclick="playAudio('h${i}','${d.wav.replace(/'/g,"\\'")}')">▶</button>`:''}
       </div>
     </div>`;
   }).join('');
 }
-
 function setPanelFilter(f,btn){
   panelDateFilter=f;
   document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');buildPanelHist();
 }
 
-function setTimeFilter(f,btn){
-  timeFilter=f;
-  $('time-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');buildAll();
+// === CAMERA ===
+async function loadCamera(){
+  $('cam-loading').style.display='block';$('cam-feed').innerHTML='';
+  try{
+    const res=await fetch(PROXY+'/camera');
+    const data=await res.json();
+    const dets=data.detections||[];
+    $('cam-sp').textContent=new Set(dets.map(d=>d.common_name)).size;
+    $('cam-ct').textContent=dets.length;
+    if(!dets.length){$('cam-feed').innerHTML='<div class="empty-state">No camera detections today</div>';return;}
+    $('cam-feed').innerHTML=dets.map(d=>{
+      const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+      const conf=Math.round((d.score||0)*100);
+      const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+      return `<div class="cam-card">
+        <div class="cam-thumb">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+        <div class="cam-info">
+          <div class="cam-species">${d.common_name}</div>
+          <div class="cam-sci">${d.species||''}</div>
+          <div class="cam-meta">
+            <span class="cam-time">${t} · ${dt}</span>
+            ${conf>0?`<span class="cam-conf">${conf}%</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){$('cam-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
+  $('cam-loading').style.display='none';
+  cameraLoaded=true;
 }
 
-function setConfFilter(f,btn){
-  confFilter=f;
-  $('conf-row').querySelectorAll('.chip:not(.rare-chip)').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');buildAll();
-}
-
-function toggleRare(btn){rareOnly=!rareOnly;btn.classList.toggle('active',rareOnly);buildAll()}
-
-function setFeedView(v,btn){
-  feedView=v;
-  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+// === FILTERS ===
+async function setTime(f,btn){
+  timeFilter=f;calSelectedDate=null;
+  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
-  const f=filterByTime(allDetections,timeFilter).filter(d=>passesConf(d.score));
-  buildFeed(rareOnly?f.filter(d=>isRare(d.cn)):f);
+  $('cal-chip').textContent='📅 Date';
+  if(['week','month','year','all'].includes(f)&&!historyPromise){
+    setStatus('','Loading history…');
+    ensureHistory().then(()=>{
+      setStatus('live',`${allDetections.length} detections`);
+      buildAll();
+    });
+  }
+  buildAll();
+}
+function setConf(f,btn){
+  confFilter=f;
+  document.querySelectorAll('.filter-bar .chip:not(#cal-chip)').forEach(c=>{
+    if(['All conf','High','Med+'].includes(c.textContent))c.classList.remove('active');
+  });
+  btn.classList.add('active');buildAll();
 }
 
+// === TABS ===
 function switchTab(name,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   $('tab-'+name).classList.add('active');btn.classList.add('active');
+  activeTab=name;
+  const f=filteredDets();
+  if(name==='activity'){buildHourly(f);buildHeatmap();buildTopSp(f);}
+  if(name==='species')buildSpeciesList(f);
+  if(name==='feed'){feedPage=0;buildFeed(f);}
+  if(name==='camera'&&!cameraLoaded)loadCamera();
 }
 
-// ── CALENDAR ─────────────────────────────────────────────────────────
-let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
-let calSelectedDate=null; // 'YYYY-MM-DD' string or null
-
-function openCal(){
-  calYear=new Date().getFullYear();calMonth=new Date().getMonth();
-  renderCal();
-  $('cal-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
+// === CALENDAR ===
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+function openCal(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();renderCal();$('cal-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeCal(){$('cal-overlay').classList.remove('open');document.body.style.overflow='';}
-function handleCalOverlayClick(e){if(e.target===$('cal-overlay'))closeCal();}
-function calNav(dir){
-  calMonth+=dir;
-  if(calMonth>11){calMonth=0;calYear++}
-  if(calMonth<0){calMonth=11;calYear--}
-  renderCal();
-}
-
+function handleCalClick(e){if(e.target===$('cal-overlay'))closeCal();}
+function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCal();}
 function renderCal(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   $('cal-title').textContent=months[calMonth]+' '+calYear;
-  const today=new Date();
-  const todayStr=today.toISOString().slice(0,10);
-  // Get days with detections this month
-  const daysWithData=new Set(
-    allDetections
-      .filter(d=>new Date(d.dt).getFullYear()===calYear&&new Date(d.dt).getMonth()===calMonth)
-      .map(d=>new Date(d.dt).toISOString().slice(0,10))
-  );
+  const todayStr=new Date().toISOString().slice(0,10);
+  const daysWithData=new Set(allDetections.filter(d=>new Date(d.dt).getFullYear()===calYear&&new Date(d.dt).getMonth()===calMonth).map(d=>new Date(d.dt).toISOString().slice(0,10)));
   const firstDay=new Date(calYear,calMonth,1).getDay();
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   let html='';
-  // Empty cells for start of month
-  for(let i=0;i<firstDay;i++) html+='<button class="cal-day empty" disabled></button>';
+  for(let i=0;i<firstDay;i++)html+='<button class="cal-day empty" disabled></button>';
   for(let d=1;d<=daysInMonth;d++){
-    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const hasData=daysWithData.has(dateStr);
-    const isToday=dateStr===todayStr;
-    const isSelected=dateStr===calSelectedDate;
-    html+=`<button class="cal-day${hasData?' has-data':''}${isToday?' today':''}${isSelected?' selected':''}" onclick="selectCalDay('${dateStr}')">${d}</button>`;
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cls=[daysWithData.has(ds)?'has-data':'',ds===todayStr?'today':'',ds===calSelectedDate?'selected':''].join(' ');
+    html+=`<button class="cal-day ${cls}" onclick="pickDay('${ds}')">${d}</button>`;
   }
-  // Remove old day buttons, keep dow headers (first 7 children)
-  const grid=$('cal-grid');
-  while(grid.children.length>7) grid.removeChild(grid.lastChild);
-  grid.insertAdjacentHTML('beforeend', html);
+  const grid=$('cal-grid');while(grid.children.length>7)grid.removeChild(grid.lastChild);
+  grid.insertAdjacentHTML('beforeend',html);
 }
-
-function selectCalDay(dateStr){
-  calSelectedDate=dateStr;
-  timeFilter='day:'+dateStr;
-  // Update chip display
-  document.querySelectorAll('#time-row .chip').forEach(c=>c.classList.remove('active'));
-  const d=new Date(dateStr+'T12:00:00');
+function pickDay(ds){
+  calSelectedDate=ds;timeFilter='day:'+ds;
+  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
+  const d=new Date(ds+'T12:00');
   $('cal-chip').textContent='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
   $('cal-chip').classList.add('active');
-  closeCal();
-  buildAll();
+  closeCal();buildAll();
+}
+function clearCal(){
+  calSelectedDate=null;$('cal-chip').textContent='📅 Date';closeCal();
+  const chips=document.querySelectorAll('.filter-bar .chip');
+  chips.forEach(c=>c.classList.remove('active'));
+  chips[2].classList.add('active');// 24h default
+  timeFilter='24h';buildAll();
 }
 
-function clearCalFilter(){
-  calSelectedDate=null;
-  $('cal-chip').textContent='📅 Pick day';
-  closeCal();
-  // Revert to 24h
-  setTimeFilter('24h', $('time-row').querySelectorAll('.chip')[2]);
+// === AUTO REFRESH ===
+function scheduleAutoRefresh(){
+  if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
+  autoRefreshTimer=setTimeout(()=>{
+    const busy=currentlyPlaying||$('sp-panel').classList.contains('open')||$('hour-sheet').classList.contains('open');
+    if(busy){autoRefreshTimer=setTimeout(scheduleAutoRefresh,15000);return;}
+    init();
+  },120000);
 }
 
-// Override cutoffFor to handle day filter
-const _origCutoff=cutoffFor;
-window.cutoffFor=function(f){
-  if(f&&f.startsWith('day:')){
-    const date=f.slice(4);
-    return null; // handled separately
+// === INIT ===
+async function init(){
+  clearErr();
+  $('loading').style.display='block';
+  $('app').style.display='none';
+  historyPromise=null;nextToken=null;allDetections=[];
+  setStatus('','Connecting…');
+  try{
+    await Promise.all([loadEbirdCurrentMonth(),fetchRecent()]);
+    $('loading').style.display='none';
+    $('app').style.display='block';
+    buildAll();
+    setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} recent`);
+    // Load history in background
+    setTimeout(()=>{
+      ensureHistory().then(()=>{
+        setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} detections`);
+        if(['week','month','year','all'].includes(timeFilter)||calSelectedDate)buildAll();
+        buildHeatmap();// always refresh heatmap with full data
+      });
+    },600);
+    scheduleAutoRefresh();
+  }catch(e){
+    $('loading').style.display='none';
+    showErr(e.message);setStatus('error','Error');
   }
-  return _origCutoff(f);
-};
-const _origFilterByTime=filterByTime;
-window.filterByTime=function(dets,f){
-  if(f&&f.startsWith('day:')){
-    const date=f.slice(4);
-    return dets.filter(d=>new Date(d.dt).toISOString().slice(0,10)===date);
-  }
-  return _origFilterByTime(dets,f);
-};
-window.labelFor=function(f){
-  if(f&&f.startsWith('day:')){
-    const d=new Date(f.slice(4)+'T12:00:00');
-    return d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
-  }
-  return {'1h':'last hour','12h':'last 12h','24h':'last 24h','week':'this week','month':'this month','year':'this year','all':'all time'}[f]||f;
-};
-
-// ── CAMERA ────────────────────────────────────────────────────────────
-let cameraLoaded = false;
-
-async function loadCameraDetections() {
-  $('cam-loading').style.display = 'block';
-  $('cam-feed').innerHTML = '';
-  try {
-    const resp = await fetch(PROXY + '/camera');
-    const data = await resp.json();
-    const dets = data.detections || [];
-
-    const species = new Set(dets.map(d => d.common_name));
-    $('cam-species').textContent = species.size;
-    $('cam-sightings').textContent = dets.length;
-
-    if (!dets.length) {
-      $('cam-feed').innerHTML = '<div class="empty-msg">No camera detections today</div>';
-    } else {
-      $('cam-feed').innerHTML = dets.map(d => {
-        const time = new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-        const date = new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
-        const conf = Math.round((d.score || 0) * 100);
-        const photoUrl = d.photo_key ? `${PROXY}/photo/${d.photo_key}` : null;
-        return `<div class="cam-card">
-          ${photoUrl
-            ? `<img class="cam-photo" src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`
-            : `<div class="cam-photo-placeholder">🐦</div>`}
-          <div class="cam-info">
-            <div class="cam-species">${d.common_name}</div>
-            <div class="cam-sci">${d.species}</div>
-            <div class="cam-meta">
-              <span class="cam-time">${time} · ${date}</span>
-              ${conf > 0 ? `<span class="cam-conf">${conf}%</span>` : ''}
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  } catch(e) {
-    $('cam-feed').innerHTML = `<div class="error-msg">Could not load camera detections: ${e.message}</div>`;
-  }
-  $('cam-loading').style.display = 'none';
-  cameraLoaded = true;
 }
-
-// Override switchTab to lazy-load camera
-const _origSwitchTab = switchTab;
-window.switchTab = function(name, btn) {
-  _origSwitchTab(name, btn);
-  if (name === 'camera' && !cameraLoaded) loadCameraDetections();
-};
 
 window.addEventListener('DOMContentLoaded',init);
 </script>
