@@ -149,6 +149,15 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.15);paddi
 .error-msg{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:var(--rare);padding:11px 15px;border-radius:4px;font-size:0.72rem;margin:14px 20px}
 .empty-msg{color:rgba(26,26,20,.35);font-size:.73rem;padding:22px 0;text-align:center}
 footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);letter-spacing:.06em}
+.cam-card{background:white;border:1px solid rgba(26,26,20,0.1);border-radius:8px;margin-bottom:12px;box-shadow:0 1px 4px var(--shadow);overflow:hidden;display:flex;gap:0}
+.cam-photo{width:110px;min-height:90px;background:var(--mist);object-fit:cover;flex-shrink:0}
+.cam-photo-placeholder{width:110px;min-height:90px;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+.cam-info{padding:12px;flex:1;min-width:0}
+.cam-species{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--moss)}
+.cam-sci{font-size:0.6rem;color:rgba(26,26,20,0.35);font-style:italic;margin-top:2px}
+.cam-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.cam-time{font-size:0.62rem;color:rgba(26,26,20,0.4)}
+.cam-conf{font-size:0.58rem;background:rgba(76,175,119,.15);color:#2a7a4a;padding:2px 6px;border-radius:10px;font-weight:500}
 /* CALENDAR */
 .cal-overlay{position:fixed;inset:0;z-index:300;background:rgba(26,26,20,0.35);display:none;align-items:flex-end;justify-content:center}
 .cal-overlay.open{display:flex}
@@ -224,6 +233,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <button class="tab-btn active" onclick="switchTab('feed',this)">Feed</button>
     <button class="tab-btn" onclick="switchTab('species',this)">Species</button>
     <button class="tab-btn" onclick="switchTab('activity',this)">Activity</button>
+    <button class="tab-btn" onclick="switchTab('camera',this)">📷 Camera</button>
   </div>
   <div class="tab-pane active" id="tab-feed">
     <div class="view-toggle">
@@ -242,6 +252,23 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <div class="chart-section">
       <div class="chart-title">Top Species</div>
       <div class="hbar-chart" id="top-sp-chart"></div>
+    </div>
+  </div>
+
+  <!-- CAMERA TAB -->
+  <div class="tab-pane" id="tab-camera">
+    <div style="padding:12px 20px 6px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss)">Visual Detections</div>
+      <button class="refresh-btn" onclick="loadCameraDetections()" style="font-size:0.6rem">↻ Refresh</button>
+    </div>
+    <div class="stats-row" style="padding:0 20px 10px">
+      <div class="stat-card"><div class="stat-label">Species</div><div class="stat-value" id="cam-species">—</div><div class="stat-sub">today</div></div>
+      <div class="stat-card"><div class="stat-label">Sightings</div><div class="stat-value" id="cam-sightings">—</div><div class="stat-sub">today</div></div>
+      <div class="stat-card"><div class="stat-label">Camera</div><div class="stat-value" style="font-size:0.75rem;padding-top:6px">Pam &amp; Hugo</div><div class="stat-sub">Nevada County</div></div>
+    </div>
+    <div id="cam-feed" style="padding:0 20px"></div>
+    <div id="cam-loading" class="loading-msg" style="display:none">
+      <div class="loading-dots"><span>·</span><span>·</span><span>·</span></div>
     </div>
   </div>
 </div>
@@ -501,8 +528,18 @@ async function init(){
   $('app').style.display='block';
   buildAll();
   setStatus('live',`Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${allDetections.length} detections`);
+  scheduleAutoRefresh();
+}
+
+// Auto-refresh every 2 minutes, but never interrupt the user:
+// if audio is playing or the species panel is open, wait and retry shortly.
+function scheduleAutoRefresh(){
   if(autoRefreshTimer)clearTimeout(autoRefreshTimer);
-  autoRefreshTimer=setTimeout(init,600000);
+  autoRefreshTimer=setTimeout(()=>{
+    const busy=currentlyPlaying||$('species-panel').classList.contains('open')||$('cal-overlay').classList.contains('open');
+    if(busy){ autoRefreshTimer=setTimeout(scheduleAutoRefresh,15000); return; }
+    init();
+  },120000);
 }
 
 async function loadMore(){
@@ -751,7 +788,7 @@ function buildPanelHist(){
       <div class="hist-date">${fmtDate(d.dt)}</div>
       <div class="hist-right">
         <span class="conf-badge conf-${cl}">${Math.round(d.score*100)}%</span>
-        ${d.wav?`<button class="play-btn" id="hpb-${i}" onclick="playAudio('h${i}','${d.wav.replace(/'/g,"\\'")}')">▶</button>`:''}
+        ${d.wav?`<button class="play-btn" id="pb-h${i}" onclick="playAudio('h${i}','${d.wav.replace(/'/g,"\\'")}')">▶</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -882,6 +919,58 @@ window.labelFor=function(f){
     return d.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
   }
   return {'1h':'last hour','12h':'last 12h','24h':'last 24h','week':'this week','month':'this month','year':'this year','all':'all time'}[f]||f;
+};
+
+// ── CAMERA ────────────────────────────────────────────────────────────
+let cameraLoaded = false;
+
+async function loadCameraDetections() {
+  $('cam-loading').style.display = 'block';
+  $('cam-feed').innerHTML = '';
+  try {
+    const resp = await fetch(PROXY + '/camera');
+    const data = await resp.json();
+    const dets = data.detections || [];
+
+    const species = new Set(dets.map(d => d.common_name));
+    $('cam-species').textContent = species.size;
+    $('cam-sightings').textContent = dets.length;
+
+    if (!dets.length) {
+      $('cam-feed').innerHTML = '<div class="empty-msg">No camera detections today</div>';
+    } else {
+      $('cam-feed').innerHTML = dets.map(d => {
+        const time = new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+        const date = new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+        const conf = Math.round((d.score || 0) * 100);
+        const photoUrl = d.photo_key ? `${PROXY}/photo/${d.photo_key}` : null;
+        return `<div class="cam-card">
+          ${photoUrl
+            ? `<img class="cam-photo" src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`
+            : `<div class="cam-photo-placeholder">🐦</div>`}
+          <div class="cam-info">
+            <div class="cam-species">${d.common_name}</div>
+            <div class="cam-sci">${d.species}</div>
+            <div class="cam-meta">
+              <span class="cam-time">${time} · ${date}</span>
+              ${conf > 0 ? `<span class="cam-conf">${conf}%</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    $('cam-feed').innerHTML = `<div class="error-msg">Could not load camera detections: ${e.message}</div>`;
+  }
+  $('cam-loading').style.display = 'none';
+  cameraLoaded = true;
+}
+
+// Override switchTab to lazy-load camera
+const _origSwitchTab = switchTab;
+window.switchTab = function(name, btn) {
+  _origSwitchTab(name, btn);
+  if (name === 'camera' && !cameraLoaded) loadCameraDetections();
 };
 
 window.addEventListener('DOMContentLoaded',init);
