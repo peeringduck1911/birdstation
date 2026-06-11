@@ -203,6 +203,8 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .rb-btn{font-size:0.68rem;font-weight:600;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;color:#fff}
 .rb-appr{background:#4c8f63}.rb-appr:hover{background:#3d7a52}
 .rb-rej{background:#c0564a}.rb-rej:hover{background:#a8493e}
+.rb-sp{width:120px;font-size:0.72rem;padding:3px 6px;border:1px solid rgba(26,26,20,.18);border-radius:5px}
+.cam-filter{width:100%;font-size:0.78rem;padding:7px 10px;border:1px solid rgba(26,26,20,.16);border-radius:7px;background:#fff;box-sizing:border-box}
 .lb-actions{margin-top:14px;width:min(92vw,520px);display:none}
 .lb-btns{display:flex;gap:10px}
 .lb-actions .btn-approve,.lb-actions .btn-reject{flex:1;font-size:0.9rem;padding:10px}
@@ -392,16 +394,20 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div class="stat-mini"><div class="lbl">Sightings</div><div class="val" id="cam-ct">—</div></div>
       <div class="stat-mini"><div class="lbl">Camera</div><div class="val" style="font-size:0.75rem;padding-top:6px">Sony A1</div></div>
     </div>
+    <div style="padding:0 20px 8px"><input id="cam-filter" class="cam-filter" placeholder="🔍 filter by species…" list="species-opts" autocomplete="off" oninput="renderCamera()"></div>
     <div id="cam-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
     <div class="cam-grid" id="cam-feed"></div>
   </div>
 
   <div class="tab-pane" id="tab-review">
     <div class="review-bulk" id="review-bulk" style="display:none">
-      <span class="rb-grp">Approve all ≥ <input id="appr-thr" class="rb-thr" type="number" value="92" min="0" max="100" inputmode="numeric">%
+      <span class="rb-grp">Approve ≥ <input id="appr-thr" class="rb-thr" type="number" value="92" min="0" max="100" inputmode="numeric">%
         <button class="rb-btn rb-appr" onclick="bulkApprove()">Approve</button></span>
-      <span class="rb-grp">Reject all &lt; <input id="rej-thr" class="rb-thr" type="number" value="50" min="0" max="100" inputmode="numeric">%
+      <span class="rb-grp">Reject &lt; <input id="rej-thr" class="rb-thr" type="number" value="50" min="0" max="100" inputmode="numeric">%
         <button class="rb-btn rb-rej" onclick="bulkReject()">Reject</button></span>
+      <span class="rb-grp">Reject species <input id="rej-sp" class="rb-sp" list="species-opts" placeholder="e.g. woodpecker" autocomplete="off">
+        <button class="rb-btn rb-rej" onclick="bulkRejectSpecies()">Reject</button></span>
+      <button class="rb-btn rb-rej" onclick="bulkRejectAll()">Reject ALL</button>
     </div>
     <div id="review-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
     <div class="cam-grid" id="review-feed"></div>
@@ -573,6 +579,7 @@ let currentlyPlaying=null, autoRefreshTimer=null;
 let currentMonthSpecies=new Set();
 let feedPage=0; const FEED_PAGE_SIZE=60;
 let cameraLoaded=false;
+let camDets=[], camIds=new Set();
 let activeTab='activity';
 
 const $=id=>document.getElementById(id);
@@ -1175,6 +1182,10 @@ function openLightbox(id){
       </div>${altHtml}
       <div class="manual-row"><input class="manual-in" id="lb-man" list="species-opts" placeholder="🔍 correct species…" autocomplete="off"><button class="btn-manual" onclick="lbApproveManual('${id}')">Confirm as</button></div>`;
     act.style.display='block';
+  } else if(camIds.has(id)){
+    const bdate=new Date(d.timestamp).toLocaleDateString('en-CA');
+    act.innerHTML=`<div class="lb-btns"><button class="btn-reject" onclick="removeCamera('${id}','${bdate}')">✕ Remove (mistaken ID)</button></div>`;
+    act.style.display='block';
   } else {
     act.style.display='none'; act.innerHTML='';
   }
@@ -1197,33 +1208,53 @@ async function loadCamera(){
   try{
     const res=await fetch(PROXY+'/camera');
     const data=await res.json();
-    const dets=data.detections||[];
-    $('cam-sp').textContent=new Set(dets.map(d=>d.common_name)).size;
-    $('cam-ct').textContent=dets.length;
-    if(!dets.length){$('cam-feed').innerHTML='<div class="empty-state">No camera detections today</div>';return;}
-    dets.forEach(d=>{lbStore[d.id]=d;});
-    $('cam-feed').innerHTML=dets.map(d=>{
-      const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
-      const conf=Math.round((d.score||0)*100);
-      const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
-      const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
-      return `<div class="cam-card">
-        <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
-        <div class="cam-info">
-          <div class="cam-species">${d.common_name}</div>
-          <div class="cam-sci">${d.species||''}</div>
-          <div class="cam-meta">
-            <span class="cam-time">${t} · ${dt}</span>
-            ${conf>0?`<span class="cam-conf">${conf}%</span>`:''}
-            ${confFlag(d)}
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+    camDets=data.detections||[];
+    camIds=new Set(camDets.map(d=>d.id));
+    camDets.forEach(d=>{lbStore[d.id]=d;});
+    ensureSpeciesList();
+    renderCamera();
   }catch(e){$('cam-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
   $('cam-loading').style.display='none';
   cameraLoaded=true;
+}
+function renderCamera(){
+  const q=($('cam-filter')?$('cam-filter').value:'').trim().toLowerCase();
+  const dets=q?camDets.filter(d=>(d.common_name||'').toLowerCase().includes(q)):camDets;
+  $('cam-sp').textContent=new Set(dets.map(d=>d.common_name)).size;
+  $('cam-ct').textContent=dets.length;
+  if(!camDets.length){$('cam-feed').innerHTML='<div class="empty-state">No camera detections today</div>';return;}
+  if(!dets.length){$('cam-feed').innerHTML=`<div class="empty-state">No sightings matching "${q}"</div>`;return;}
+  $('cam-feed').innerHTML=dets.map(d=>{
+    const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+    const conf=Math.round((d.score||0)*100);
+    const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+    const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
+    const bdate=new Date(d.timestamp).toLocaleDateString('en-CA');
+    return `<div class="cam-card" id="cam-${d.id}">
+      <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+      <div class="cam-info">
+        <div class="cam-species">${d.common_name}</div>
+        <div class="cam-sci">${d.species||''}</div>
+        <div class="cam-meta">
+          <span class="cam-time">${t} · ${dt}</span>
+          ${conf>0?`<span class="cam-conf">${conf}%</span>`:''}
+          ${confFlag(d)}
+        </div>
+        <div class="review-actions"><button class="btn-reject" onclick="removeCamera('${d.id}','${bdate}')">✕ Remove</button></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function removeCamera(id, date){
+  if(!confirm('Remove this confirmed sighting? Use this if it was a mistaken ID.'))return;
+  const card=$('cam-'+id);
+  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
+  try{
+    await fetch(PROXY+'/camera/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,date})});
+    camDets=camDets.filter(d=>d.id!==id);camIds.delete(id);
+    closeLightbox();renderCamera();
+  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
 }
 
 // === REVIEW ===
@@ -1325,6 +1356,30 @@ async function bulkReject(){
     const j=await r.json();
     await loadReview();loadReviewCount();
     alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);
+  }catch(e){alert('Error: '+e.message);}
+}
+async function bulkRejectSpecies(){
+  const q=($('rej-sp').value||'').trim();
+  if(!q){$('rej-sp').focus();return;}
+  const n=reviewPending.filter(d=>(d.common_name||'').toLowerCase().includes(q.toLowerCase())).length;
+  if(!n){alert(`No pending items matching "${q}"`);return;}
+  if(!confirm(`Reject ${n} pending sighting${n>1?'s':''} matching "${q}"? This can't be undone.`))return;
+  try{
+    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({species_contains:q})});
+    const j=await r.json();
+    await loadReview();loadReviewCount();
+    alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);
+  }catch(e){alert('Error: '+e.message);}
+}
+async function bulkRejectAll(){
+  const n=reviewPending.length;
+  if(!n)return;
+  if(!confirm(`Reject ALL ${n} pending sightings? This clears the entire queue and can't be undone.`))return;
+  try{
+    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:1.01})});
+    const j=await r.json();
+    await loadReview();loadReviewCount();
+    alert(`Rejected ${j.rejected}. Queue cleared.`);
   }catch(e){alert('Error: '+e.message);}
 }
 async function rejectReview(id){
