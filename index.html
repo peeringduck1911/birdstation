@@ -1170,7 +1170,7 @@ function openLightbox(id){
     const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
     const altHtml=alts.length?`<div class="alt-row">${alts.map(c=>`<button class="alt-chip" onclick="lbApprove('${id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
     act.innerHTML=`<div class="lb-btns">
-        <button class="btn-approve" onclick="lbApprove('${id}')">✓ Confirm</button>
+        <button class="btn-approve" onclick="lbApprove('${id}')">✓ Confirm ${d.common_name||d.species||''}</button>
         <button class="btn-reject" onclick="lbReject('${id}')">✕ Reject</button>
       </div>${altHtml}
       <div class="manual-row"><input class="manual-in" id="lb-man" list="species-opts" placeholder="🔍 correct species…" autocomplete="off"><button class="btn-manual" onclick="lbApproveManual('${id}')">Confirm as</button></div>`;
@@ -1266,7 +1266,7 @@ async function loadReview(){
           <div class="cam-sci">${d.species||''}</div>
           <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}${confFlag(d)}</div>
           <div class="review-actions">
-            <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm</button>
+            <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm ${d.common_name}</button>
             <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
           </div>
           ${altHtml}
