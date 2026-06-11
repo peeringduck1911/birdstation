@@ -197,6 +197,18 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .manual-in{flex:1;min-width:0;font-size:0.7rem;padding:5px 8px;border:1px solid rgba(26,26,20,.18);border-radius:6px;background:#fff}
 .btn-manual{font-size:0.66rem;white-space:nowrap;padding:5px 10px;border:1px solid var(--moss,#4c8f63);background:#fff;color:#2a6a44;border-radius:6px;cursor:pointer}
 .btn-manual:hover{background:rgba(76,175,119,.12)}
+.review-bulk{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:#fff;border:1px solid rgba(26,26,20,.1);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:0.72rem;box-shadow:0 1px 4px var(--shadow)}
+.rb-grp{display:flex;align-items:center;gap:6px}
+.rb-thr{width:46px;font-size:0.72rem;padding:3px 5px;border:1px solid rgba(26,26,20,.18);border-radius:5px;text-align:center}
+.rb-btn{font-size:0.68rem;font-weight:600;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;color:#fff}
+.rb-appr{background:#4c8f63}.rb-appr:hover{background:#3d7a52}
+.rb-rej{background:#c0564a}.rb-rej:hover{background:#a8493e}
+.lb-actions{margin-top:14px;width:min(92vw,520px);display:none}
+.lb-btns{display:flex;gap:10px}
+.lb-actions .btn-approve,.lb-actions .btn-reject{flex:1;font-size:0.9rem;padding:10px}
+.lb-actions .alt-row,.lb-actions .manual-row{margin-top:10px}
+.lb-actions .alt-chip{font-size:0.72rem}
+.lb-actions .manual-in{background:#fff}
 .review-actions{display:flex;gap:8px;margin-top:10px}
 .btn-approve{flex:1;padding:7px 0;background:#2d6a4f;color:#fff;border:none;border-radius:6px;font-size:0.68rem;letter-spacing:0.04em;cursor:pointer;transition:background .15s}
 .btn-approve:hover{background:#40916c}
@@ -385,6 +397,12 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   </div>
 
   <div class="tab-pane" id="tab-review">
+    <div class="review-bulk" id="review-bulk" style="display:none">
+      <span class="rb-grp">Approve all ≥ <input id="appr-thr" class="rb-thr" type="number" value="92" min="0" max="100" inputmode="numeric">%
+        <button class="rb-btn rb-appr" onclick="bulkApprove()">Approve</button></span>
+      <span class="rb-grp">Reject all &lt; <input id="rej-thr" class="rb-thr" type="number" value="50" min="0" max="100" inputmode="numeric">%
+        <button class="rb-btn rb-rej" onclick="bulkReject()">Reject</button></span>
+    </div>
     <div id="review-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
     <div class="cam-grid" id="review-feed"></div>
   </div>
@@ -458,6 +476,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   <div class="lb-sub" id="lb-sub"></div>
   <img class="lb-main" id="lb-main" src="" alt="">
   <div class="lb-strip" id="lb-strip"></div>
+  <div class="lb-actions" id="lb-actions"></div>
 </div>
 
 <datalist id="species-opts"></datalist>
@@ -1143,8 +1162,27 @@ function openLightbox(id){
   $('lb-main').src=imgs[0];
   $('lb-strip').innerHTML=imgs.length>1?imgs.map((u,i)=>`<img src="${u}" class="${i===0?'active':''}" onclick="lbSelect(${i})">`).join(''):'';
   $('lb-strip')._imgs=imgs;
+  // Review actions in the lightbox (only for pending-review items)
+  const act=$('lb-actions');
+  if(reviewIds.has(id)){
+    ensureSpeciesList();
+    const esc=s=>String(s).replace(/'/g,"\\'");
+    const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
+    const altHtml=alts.length?`<div class="alt-row">${alts.map(c=>`<button class="alt-chip" onclick="lbApprove('${id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
+    act.innerHTML=`<div class="lb-btns">
+        <button class="btn-approve" onclick="lbApprove('${id}')">✓ Confirm</button>
+        <button class="btn-reject" onclick="lbReject('${id}')">✕ Reject</button>
+      </div>${altHtml}
+      <div class="manual-row"><input class="manual-in" id="lb-man" list="species-opts" placeholder="🔍 correct species…" autocomplete="off"><button class="btn-manual" onclick="lbApproveManual('${id}')">Confirm as</button></div>`;
+    act.style.display='block';
+  } else {
+    act.style.display='none'; act.innerHTML='';
+  }
   $('lb-overlay').classList.add('open');
 }
+function lbApprove(id,name){approveReview(id,name);closeLightbox();}
+function lbReject(id){rejectReview(id);closeLightbox();}
+function lbApproveManual(id){const v=($('lb-man')?$('lb-man').value.trim():'');if(!v){if($('lb-man'))$('lb-man').focus();return;}approveReview(id,v);closeLightbox();}
 function lbSelect(i){
   const imgs=$('lb-strip')._imgs||[];if(!imgs[i])return;
   $('lb-main').src=imgs[i];
@@ -1190,6 +1228,7 @@ async function loadCamera(){
 
 // === REVIEW ===
 let reviewLoaded=false;
+let reviewPending=[], reviewIds=new Set();
 async function loadReviewCount(){
   try{
     const res=await fetch(PROXY+'/review');
@@ -1206,6 +1245,8 @@ async function loadReview(){
     const res=await fetch(PROXY+'/review');
     const data=await res.json();
     const pending=data.pending||[];
+    reviewPending=pending; reviewIds=new Set(pending.map(d=>d.id));
+    $('review-bulk').style.display=pending.length?'flex':'none';
     if(!pending.length){$('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';$('review-badge').style.display='none';$('review-loading').style.display='none';reviewLoaded=true;return;}
     ensureSpeciesList();
     pending.forEach(d=>{lbStore[d.id]=d;});
@@ -1261,6 +1302,30 @@ function approveManual(id){
   const v=el?el.value.trim():'';
   if(!v){if(el)el.focus();return;}
   approveReview(id, v);
+}
+async function bulkApprove(){
+  const thr=Math.max(0,Math.min(100,parseFloat($('appr-thr').value)||92));
+  const n=reviewPending.filter(d=>(d.score||0)*100>=thr).length;
+  if(!n){alert(`No pending items ≥ ${thr}%`);return;}
+  if(!confirm(`Approve ${n} sighting${n>1?'s':''} at ≥ ${thr}% confidence?`))return;
+  try{
+    const r=await fetch(PROXY+'/review/approve-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_score:thr/100})});
+    const j=await r.json();
+    await loadReview();loadReviewCount();
+    alert(`Approved ${j.approved}. ${j.remaining} left to review.`);
+  }catch(e){alert('Error: '+e.message);}
+}
+async function bulkReject(){
+  const thr=Math.max(0,Math.min(100,parseFloat($('rej-thr').value)||50));
+  const n=reviewPending.filter(d=>(d.score||0)*100<thr).length;
+  if(!n){alert(`No pending items < ${thr}%`);return;}
+  if(!confirm(`Reject (discard) ${n} sighting${n>1?'s':''} below ${thr}% confidence? This can't be undone.`))return;
+  try{
+    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:thr/100})});
+    const j=await r.json();
+    await loadReview();loadReviewCount();
+    alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);
+  }catch(e){alert('Error: '+e.message);}
 }
 async function rejectReview(id){
   const card=$('rv-'+id);
