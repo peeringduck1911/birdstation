@@ -188,6 +188,15 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .cam-time{font-size:0.62rem;color:rgba(26,26,20,0.4)}
 .cam-conf{font-size:0.58rem;background:rgba(76,175,119,.15);color:#2a7a4a;padding:2px 6px;border-radius:10px;font-weight:500}
 .cam-flag{font-size:0.58rem;background:rgba(214,158,46,.18);color:#9a6a12;padding:2px 6px;border-radius:10px;font-weight:600}
+.alt-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:7px}
+.alt-label{font-size:0.6rem;color:#8a8a7e;margin-right:2px}
+.alt-chip{font-size:0.62rem;background:rgba(76,175,119,.1);color:#2a6a44;border:1px solid rgba(76,175,119,.35);padding:3px 8px;border-radius:12px;cursor:pointer}
+.alt-chip:hover{background:rgba(76,175,119,.22)}
+.alt-pct{opacity:.6;font-weight:600}
+.manual-row{display:flex;gap:6px;margin-top:7px}
+.manual-in{flex:1;min-width:0;font-size:0.7rem;padding:5px 8px;border:1px solid rgba(26,26,20,.18);border-radius:6px;background:#fff}
+.btn-manual{font-size:0.66rem;white-space:nowrap;padding:5px 10px;border:1px solid var(--moss,#4c8f63);background:#fff;color:#2a6a44;border-radius:6px;cursor:pointer}
+.btn-manual:hover{background:rgba(76,175,119,.12)}
 .review-actions{display:flex;gap:8px;margin-top:10px}
 .btn-approve{flex:1;padding:7px 0;background:#2d6a4f;color:#fff;border:none;border-radius:6px;font-size:0.68rem;letter-spacing:0.04em;cursor:pointer;transition:background .15s}
 .btn-approve:hover{background:#40916c}
@@ -451,12 +460,17 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   <div class="lb-strip" id="lb-strip"></div>
 </div>
 
+<datalist id="species-opts"></datalist>
+
 <footer>Pam &amp; Hugo Bird Station · BirdNET / Haikubox · eBird Nevada County CA</footer>
 
 <script>
 const PROXY='https://bitter-sky-994d.chrisbiertuempfel.workers.dev';
 const SERIAL='Haikubox_3485188DDE1C';
 const EBIRD_KEY='ekcngbuc33mk';
+// Nevada County species for the manual-correction search box (datalist allows free text too)
+const SPECIES=["Acorn Woodpecker","Allen's Hummingbird","American Crow","American Goldfinch","American Kestrel","American Robin","Anna's Hummingbird","Ash-throated Flycatcher","Bald Eagle","Band-tailed Pigeon","Bewick's Wren","Black Phoebe","Black-headed Grosbeak","Brown-headed Cowbird","Bushtit","California Quail","California Scrub-Jay","Cassin's Vireo","Cedar Waxwing","Chestnut-backed Chickadee","Chipping Sparrow","Clark's Nutcracker","Common Raven","Cooper's Hawk","Dark-eyed Junco","Downy Woodpecker","Evening Grosbeak","Fox Sparrow","Golden-crowned Kinglet","Golden-crowned Sparrow","Great Horned Owl","Hairy Woodpecker","Hermit Thrush","House Finch","House Wren","Hutton's Vireo","Lazuli Bunting","Lesser Goldfinch","Mourning Dove","Northern Flicker","Nuttall's Woodpecker","Oak Titmouse","Orange-crowned Warbler","Pacific Wren","Pine Siskin","Purple Finch","Red-tailed Hawk","Ruby-crowned Kinglet","Song Sparrow","Spotted Towhee","Steller's Jay","Townsend's Warbler","Turkey Vulture","Varied Thrush","Western Bluebird","Western Tanager","Western Wood-Pewee","White-breasted Nuthatch","White-crowned Sparrow","Wild Turkey","Wilson's Warbler","Yellow-rumped Warbler"];
+function ensureSpeciesList(){const dl=$('species-opts');if(dl&&!dl.children.length){dl.innerHTML=SPECIES.map(s=>`<option value="${s}">`).join('');}}
 const EBIRD_REGION='US-CA-057';
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1193,6 +1207,7 @@ async function loadReview(){
     const data=await res.json();
     const pending=data.pending||[];
     if(!pending.length){$('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';$('review-badge').style.display='none';$('review-loading').style.display='none';reviewLoaded=true;return;}
+    ensureSpeciesList();
     pending.forEach(d=>{lbStore[d.id]=d;});
     $('review-feed').innerHTML=pending.map(d=>{
       const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -1200,6 +1215,9 @@ async function loadReview(){
       const conf=Math.round((d.score||0)*100);
       const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
       const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
+      const esc=s=>String(s).replace(/'/g,"\\'");
+      const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
+      const altHtml=alts.length?`<div class="alt-row"><span class="alt-label">or pick:</span>${alts.map(c=>`<button class="alt-chip" onclick="approveReview('${d.id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
       return `<div class="cam-card" id="rv-${d.id}">
         <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
         <div class="cam-info">
@@ -1209,6 +1227,11 @@ async function loadReview(){
           <div class="review-actions">
             <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm</button>
             <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
+          </div>
+          ${altHtml}
+          <div class="manual-row">
+            <input class="manual-in" id="man-${d.id}" list="species-opts" placeholder="🔍 correct species…" autocomplete="off">
+            <button class="btn-manual" onclick="approveManual('${d.id}')">Confirm as</button>
           </div>
         </div>
       </div>`;
@@ -1222,14 +1245,22 @@ function checkReviewEmpty(){
     $('review-badge').style.display='none';
   }
 }
-async function approveReview(id){
+async function approveReview(id, overrideName){
   const card=$('rv-'+id);
   if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
   try{
-    await fetch(PROXY+'/review/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const body={id};
+    if(overrideName) body.common_name=overrideName;
+    await fetch(PROXY+'/review/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(card)card.remove();
     loadReviewCount();checkReviewEmpty();
   }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
+}
+function approveManual(id){
+  const el=$('man-'+id);
+  const v=el?el.value.trim():'';
+  if(!v){if(el)el.focus();return;}
+  approveReview(id, v);
 }
 async function rejectReview(id){
   const card=$('rv-'+id);
