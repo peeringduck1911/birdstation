@@ -214,13 +214,25 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .status-tag{font-size:0.55rem;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:9px;font-weight:700}
 .tag-pending{background:rgba(214,158,46,.18);color:#9a6a12}
 .tag-ok{background:rgba(76,175,119,.15);color:#2a7a4a}
-.live-launch{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:48px 24px}
-.live-emoji{font-size:3rem}
-.live-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--moss,#3d7a52)}
-.live-launch .live-hint{font-size:0.74rem;color:#7a7a6e;max-width:340px;line-height:1.5}
-.live-btn{margin-top:6px;background:var(--moss,#4c8f63);color:#fff;font-size:0.95rem;font-weight:600;padding:12px 26px;border-radius:10px;text-decoration:none}
-.live-btn:hover{background:#3d7a52}
-.live-alt{font-size:0.72rem;color:#7a7a6e;text-decoration:none;border-bottom:1px dotted #aaa}
+.live-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px 6px;font-size:0.8rem;font-weight:600;color:var(--moss,#3d7a52)}
+.live-auto{font-size:0.6rem;color:#9a9a8e;font-weight:400}
+.live-open{font-size:0.7rem;font-weight:600;color:#fff;background:var(--moss,#4c8f63);padding:6px 12px;border-radius:8px;text-decoration:none;white-space:nowrap}
+.live-body{padding:4px 20px 24px}
+.live-stats{display:flex;gap:10px;margin-bottom:14px}
+.live-stat{flex:1;background:#fff;border:1px solid rgba(26,26,20,.08);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 4px var(--shadow)}
+.live-stat .lv{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--moss,#3d7a52)}
+.live-stat .ll{font-size:0.58rem;text-transform:uppercase;letter-spacing:.05em;color:#8a8a7e;margin-top:2px}
+.live-recent{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(26,26,20,.08);border-radius:10px;padding:10px;margin-bottom:16px;cursor:pointer;box-shadow:0 1px 4px var(--shadow)}
+.live-recent-img{width:64px;height:64px;border-radius:8px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:1.6rem;background:var(--mist,#eee);flex-shrink:0}
+.live-recent-lbl{font-size:0.55rem;text-transform:uppercase;letter-spacing:.06em;color:#9a9a8e}
+.live-recent-sp{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--moss,#3d7a52)}
+.live-recent-t{font-size:0.7rem;color:#8a8a7e}
+.tally-title{font-size:0.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--moss,#3d7a52);margin:4px 0 8px}
+.tally-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tally-name{flex:0 0 40%;font-size:0.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tally-bar{flex:1;height:9px;background:var(--mist,#eee);border-radius:5px;overflow:hidden}
+.tally-fill{display:block;height:100%;background:var(--moss,#4c8f63);border-radius:5px}
+.tally-n{flex:0 0 auto;font-size:0.74rem;font-weight:600;color:#6a6a5e;min-width:18px;text-align:right}
 .lb-actions{margin-top:14px;width:min(92vw,520px);display:none}
 .lb-btns{display:flex;gap:10px}
 .lb-actions .btn-approve,.lb-actions .btn-reject{flex:1;font-size:0.9rem;padding:10px}
@@ -333,13 +345,13 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('sightings',this)">📷 Sightings<span class="review-badge" id="review-badge" style="display:none"></span></button>
-    <button class="tab-btn" onclick="switchTab('audio',this)">🎵 Audio</button>
+    <button class="tab-btn active" onclick="switchTab('audio',this)">🎵 Audio</button>
+    <button class="tab-btn" onclick="switchTab('sightings',this)">📷 Sightings<span class="review-badge" id="review-badge" style="display:none"></span></button>
     <button class="tab-btn" onclick="switchTab('live',this)">🔴 Live</button>
   </div>
 
   <!-- SIGHTINGS — visual review + confirmed, merged -->
-  <div class="tab-pane active" id="tab-sightings">
+  <div class="tab-pane" id="tab-sightings">
     <div class="sight-controls">
       <div class="seg">
         <button class="seg-btn active" id="seg-review" onclick="setSightStatus('review',this)">Needs review</button>
@@ -363,7 +375,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   </div>
 
   <!-- AUDIO — Haikubox acoustic detections -->
-  <div class="tab-pane" id="tab-audio">
+  <div class="tab-pane active" id="tab-audio">
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-stat" onclick="heroClickSpecies()"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
@@ -415,13 +427,11 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
 
   <!-- LIVE — MJPEG camera stream -->
   <div class="tab-pane" id="tab-live">
-    <div class="live-launch">
-      <div class="live-emoji">📹</div>
-      <div class="live-title">Live Camera Feed</div>
-      <div class="live-hint">The stream is on your local network only. Open it in a new tab — the fullscreen button (⛶) is on that page.</div>
-      <a class="live-btn" href="http://raspberrypi.local:8080" target="_blank" rel="noopener">Open stream ↗</a>
-      <a class="live-alt" href="http://10.0.0.49:8080" target="_blank" rel="noopener">…or by IP (10.0.0.49:8080)</a>
+    <div class="live-head">
+      <span>🔴 Live at the feeder <span class="live-auto">· auto-refreshing</span></span>
+      <a class="live-open" href="http://raspberrypi.local:8080" target="_blank" rel="noopener">▶ Watch stream ↗</a>
     </div>
+    <div id="live-body" class="live-body"><div class="loading-wrap"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div></div>
   </div>
 </div>
 
@@ -591,7 +601,8 @@ let currentMonthSpecies=new Set();
 let feedPage=0; const FEED_PAGE_SIZE=60;
 let cameraLoaded=false;
 let camDets=[], camIds=new Set();
-let activeTab='sightings';
+let activeTab='audio';
+let liveTimer=null;
 
 const $=id=>document.getElementById(id);
 function setStatus(t,m){$('sdot').className='sdot '+t;$('stxt').textContent=m}
@@ -1344,6 +1355,39 @@ async function bulkRejectAll(){
   try{const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:1.01})});const j=await r.json();await loadSightings();loadReviewCount();alert(`Rejected ${j.rejected}. Queue cleared.`);}catch(e){alert('Error: '+e.message);}
 }
 
+// === LIVE TALLY (auto-refreshing "what's at the feeder today") ===
+function timeAgo(ts){const s=(Date.now()-new Date(ts))/1000;if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+async function loadLiveTally(){
+  try{
+    const data=await (await fetch(PROXY+'/sightings?days=1')).json();
+    const all=[...(data.confirmed||[]),...(data.pending||[])];
+    const todayStr=new Date().toLocaleDateString('en-CA');
+    const today=all.filter(d=>d.timestamp&&new Date(d.timestamp).toLocaleDateString('en-CA')===todayStr)
+                   .sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+    today.forEach(d=>{lbStore[d.id]=d;});
+    renderLiveTally(today);
+  }catch(e){$('live-body').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
+}
+function renderLiveTally(today){
+  const counts={}; today.forEach(d=>counts[d.common_name]=(counts[d.common_name]||0)+1);
+  const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const recent=today[0]; const max=ranked.length?ranked[0][1]:1;
+  let html=`<div class="live-stats">
+    <div class="live-stat"><div class="lv">${today.length}</div><div class="ll">sightings today</div></div>
+    <div class="live-stat"><div class="lv">${new Set(today.map(d=>d.common_name)).size}</div><div class="ll">species today</div></div>
+    <div class="live-stat"><div class="lv">${recent?timeAgo(recent.timestamp):'—'}</div><div class="ll">last seen</div></div>
+  </div>`;
+  if(recent){
+    const url=recent.photo_key?`${PROXY}/photo/${recent.photo_key}`:null;
+    html+=`<div class="live-recent" ${url?`onclick="openLightbox('${recent.id}')"`:''}>
+      ${url?`<img src="${url}" class="live-recent-img">`:'<div class="live-recent-img">🐦</div>'}
+      <div><div class="live-recent-lbl">Most recent</div><div class="live-recent-sp">${recent.common_name}</div><div class="live-recent-t">${timeAgo(recent.timestamp)}</div></div></div>`;
+  }
+  html+=`<div class="tally-title">Today's tally</div>`;
+  html+= ranked.length ? ranked.map(([sp,n])=>`<div class="tally-row"><span class="tally-name">${sp}</span><span class="tally-bar"><span class="tally-fill" style="width:${Math.round(n/max*100)}%"></span></span><span class="tally-n">${n}</span></div>`).join('') : '<div class="empty-state">No sightings yet today — check back soon.</div>';
+  $('live-body').innerHTML=html;
+}
+
 // === FILTERS ===
 async function setTime(f,btn){
   timeFilter=f;calSelectedDate=null;
@@ -1373,8 +1417,10 @@ function switchTab(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   $('tab-'+name).classList.add('active');btn.classList.add('active');
   activeTab=name;
+  if(name!=='live'&&liveTimer){clearInterval(liveTimer);liveTimer=null;}
   if(name==='sightings')loadSightings();
   if(name==='audio')buildAll();
+  if(name==='live'){loadLiveTally();clearInterval(liveTimer);liveTimer=setInterval(loadLiveTally,20000);}
 }
 
 // === CALENDAR ===
@@ -1437,8 +1483,7 @@ async function init(){
     await Promise.all([loadEbirdCurrentMonth(),fetchRecent(),loadReviewCount()]);
     $('loading').style.display='none';
     $('app').style.display='block';
-    buildAll();
-    loadSightings();   // default tab
+    buildAll();   // Audio is the default tab; Sightings/Live load on first open
     setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} recent`);
     // Load history in background
     setTimeout(()=>{
