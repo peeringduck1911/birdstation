@@ -205,6 +205,22 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .rb-rej{background:#c0564a}.rb-rej:hover{background:#a8493e}
 .rb-sp{width:120px;font-size:0.72rem;padding:3px 6px;border:1px solid rgba(26,26,20,.18);border-radius:5px}
 .cam-filter{width:100%;font-size:0.78rem;padding:7px 10px;border:1px solid rgba(26,26,20,.16);border-radius:7px;background:#fff;box-sizing:border-box}
+.sight-controls{padding:12px 20px 4px;display:flex;flex-direction:column;gap:9px}
+.seg{display:inline-flex;background:var(--mist,#eee);border-radius:8px;padding:3px;align-self:flex-start;max-width:100%}
+.seg-btn{border:none;background:none;font-size:0.72rem;font-weight:600;color:#6a6a5e;padding:6px 14px;border-radius:6px;cursor:pointer}
+.seg-btn.active{background:#fff;color:var(--moss,#3d7a52);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sight-filter-row{display:flex;gap:8px;align-items:center}
+.dh-btn{background:#6b4f8a;white-space:nowrap}.dh-btn:hover{background:#5a4175}.dh-btn.active{background:#3d7a52}
+.status-tag{font-size:0.55rem;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:9px;font-weight:700}
+.tag-pending{background:rgba(214,158,46,.18);color:#9a6a12}
+.tag-ok{background:rgba(76,175,119,.15);color:#2a7a4a}
+.live-launch{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:48px 24px}
+.live-emoji{font-size:3rem}
+.live-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--moss,#3d7a52)}
+.live-launch .live-hint{font-size:0.74rem;color:#7a7a6e;max-width:340px;line-height:1.5}
+.live-btn{margin-top:6px;background:var(--moss,#4c8f63);color:#fff;font-size:0.95rem;font-weight:600;padding:12px 26px;border-radius:10px;text-decoration:none}
+.live-btn:hover{background:#3d7a52}
+.live-alt{font-size:0.72rem;color:#7a7a6e;text-decoration:none;border-bottom:1px dotted #aaa}
 .lb-actions{margin-top:14px;width:min(92vw,520px);display:none}
 .lb-btns{display:flex;gap:10px}
 .lb-actions .btn-approve,.lb-actions .btn-reject{flex:1;font-size:0.9rem;padding:10px}
@@ -316,53 +332,72 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-grid">
-      <div class="hero-stat" onclick="heroClickSpecies()"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
-      <div class="hero-stat" onclick="heroClickDets()"><div class="val" id="h-dets">—</div><div class="lbl">detections</div></div>
-      <div class="hero-stat" onclick="heroClickPeak()"><div class="val" id="h-peak">—</div><div class="lbl">peak hour</div></div>
-      <div class="hero-stat" onclick="heroClickAllSp()"><div class="val" id="h-allsp">—</div><div class="lbl">total species</div></div>
-    </div>
-  </section>
-
-  <div class="botd" id="botd" onclick="botdClick()">
-    <div class="botd-lbl">🏆 Bird of the Day</div>
-    <div class="botd-body">
-      <div><div class="botd-name" id="botd-name">—</div><div class="botd-sci" id="botd-sci"></div></div>
-      <div><div class="botd-count" id="botd-count">0</div><div class="botd-count-lbl">detections<br><span id="botd-period">today</span></div></div>
-    </div>
-  </div>
-
-  <div class="section-header">
-    <span class="section-title">Recent Sightings</span>
-    <span class="section-sub" id="recent-sub"></span>
-  </div>
-  <div class="recent-scroll" id="recent-scroll"></div>
-
-  <div class="filter-bar">
-    <button class="chip" onclick="setTime('1h',this)">1h</button>
-    <button class="chip" onclick="setTime('12h',this)">12h</button>
-    <button class="chip active" onclick="setTime('24h',this)">24h</button>
-    <button class="chip" onclick="setTime('week',this)">Week</button>
-    <button class="chip" onclick="setTime('month',this)">Month</button>
-    <button class="chip" onclick="setTime('year',this)">Year</button>
-    <button class="chip" onclick="setTime('all',this)">All</button>
-    <button class="chip" id="cal-chip" onclick="openCal()">📅 Date</button>
-    <div class="filter-sep"></div>
-    <button class="chip active" onclick="setConf('all',this)">All conf</button>
-    <button class="chip" onclick="setConf('high',this)">High</button>
-    <button class="chip" onclick="setConf('med',this)">Med+</button>
-  </div>
-
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('activity',this)">Activity</button>
-    <button class="tab-btn" onclick="switchTab('species',this)">Species</button>
-    <button class="tab-btn" onclick="switchTab('feed',this)">Feed</button>
-    <button class="tab-btn" onclick="switchTab('camera',this)">📷 Camera</button>
-    <button class="tab-btn" onclick="switchTab('review',this)">Review<span class="review-badge" id="review-badge" style="display:none"></span></button>
+    <button class="tab-btn active" onclick="switchTab('sightings',this)">📷 Sightings<span class="review-badge" id="review-badge" style="display:none"></span></button>
+    <button class="tab-btn" onclick="switchTab('audio',this)">🎵 Audio</button>
+    <button class="tab-btn" onclick="switchTab('live',this)">🔴 Live</button>
   </div>
 
-  <div class="tab-pane active" id="tab-activity">
+  <!-- SIGHTINGS — visual review + confirmed, merged -->
+  <div class="tab-pane active" id="tab-sightings">
+    <div class="sight-controls">
+      <div class="seg">
+        <button class="seg-btn active" id="seg-review" onclick="setSightStatus('review',this)">Needs review</button>
+        <button class="seg-btn" id="seg-confirmed" onclick="setSightStatus('confirmed',this)">Confirmed</button>
+        <button class="seg-btn" id="seg-all" onclick="setSightStatus('all',this)">All</button>
+      </div>
+      <div class="sight-filter-row">
+        <input id="sight-filter" class="cam-filter" placeholder="🔍 filter by species…" list="species-opts" autocomplete="off" oninput="dhOnly=false;document.getElementById('dh-btn').classList.remove('active');renderSightings()">
+        <button class="rb-btn dh-btn" id="dh-btn" onclick="toggleDownyHairy()">🪶 Hairy / Downy</button>
+      </div>
+      <div class="review-bulk" id="review-bulk" style="display:none">
+        <span class="rb-grp">Approve ≥ <input id="appr-thr" class="rb-thr" type="number" value="92" min="0" max="100" inputmode="numeric">%
+          <button class="rb-btn rb-appr" onclick="bulkApprove()">Approve</button></span>
+        <span class="rb-grp">Reject &lt; <input id="rej-thr" class="rb-thr" type="number" value="50" min="0" max="100" inputmode="numeric">%
+          <button class="rb-btn rb-rej" onclick="bulkReject()">Reject</button></span>
+        <button class="rb-btn rb-rej" onclick="bulkRejectAll()">Reject all</button>
+      </div>
+    </div>
+    <div id="sight-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
+    <div class="cam-grid" id="sight-feed"></div>
+  </div>
+
+  <!-- AUDIO — Haikubox acoustic detections -->
+  <div class="tab-pane" id="tab-audio">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-stat" onclick="heroClickSpecies()"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
+        <div class="hero-stat" onclick="heroClickDets()"><div class="val" id="h-dets">—</div><div class="lbl">detections</div></div>
+        <div class="hero-stat" onclick="heroClickPeak()"><div class="val" id="h-peak">—</div><div class="lbl">peak hour</div></div>
+        <div class="hero-stat" onclick="heroClickAllSp()"><div class="val" id="h-allsp">—</div><div class="lbl">total species</div></div>
+      </div>
+    </section>
+    <div class="botd" id="botd" onclick="botdClick()">
+      <div class="botd-lbl">🏆 Bird of the Day</div>
+      <div class="botd-body">
+        <div><div class="botd-name" id="botd-name">—</div><div class="botd-sci" id="botd-sci"></div></div>
+        <div><div class="botd-count" id="botd-count">0</div><div class="botd-count-lbl">detections<br><span id="botd-period">today</span></div></div>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">Recently Heard</span>
+      <span class="section-sub" id="recent-sub"></span>
+    </div>
+    <div class="recent-scroll" id="recent-scroll"></div>
+    <div class="filter-bar">
+      <button class="chip" onclick="setTime('1h',this)">1h</button>
+      <button class="chip" onclick="setTime('12h',this)">12h</button>
+      <button class="chip active" onclick="setTime('24h',this)">24h</button>
+      <button class="chip" onclick="setTime('week',this)">Week</button>
+      <button class="chip" onclick="setTime('month',this)">Month</button>
+      <button class="chip" onclick="setTime('year',this)">Year</button>
+      <button class="chip" onclick="setTime('all',this)">All</button>
+      <button class="chip" id="cal-chip" onclick="openCal()">📅 Date</button>
+      <div class="filter-sep"></div>
+      <button class="chip active" onclick="setConf('all',this)">All conf</button>
+      <button class="chip" onclick="setConf('high',this)">High</button>
+      <button class="chip" onclick="setConf('med',this)">Med+</button>
+    </div>
     <div class="chart-card">
       <div class="chart-title">Activity by Hour <span class="chart-hint">— tap for species breakdown</span></div>
       <div class="hourly-chart" id="hourly-chart"></div>
@@ -371,46 +406,22 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div class="chart-title">Top Species</div>
       <div id="top-sp"></div>
     </div>
-  </div>
-
-  <div class="tab-pane" id="tab-species">
     <div class="sp-list-wrap" id="sp-list"></div>
-  </div>
-
-  <div class="tab-pane" id="tab-feed">
     <div class="feed-wrap" id="feed-list"></div>
     <div class="load-more-wrap" id="load-more-wrap" style="display:none">
       <button class="load-more-btn" onclick="loadMoreFeed()">Load more</button>
     </div>
   </div>
 
-  <div class="tab-pane" id="tab-camera">
-    <div style="padding:12px 20px 6px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--moss)">Visual Detections</div>
-      <button class="refresh-btn" onclick="loadCamera()" style="font-size:0.6rem">↻ Refresh</button>
+  <!-- LIVE — MJPEG camera stream -->
+  <div class="tab-pane" id="tab-live">
+    <div class="live-launch">
+      <div class="live-emoji">📹</div>
+      <div class="live-title">Live Camera Feed</div>
+      <div class="live-hint">The stream is on your local network only. Open it in a new tab — the fullscreen button (⛶) is on that page.</div>
+      <a class="live-btn" href="http://raspberrypi.local:8080" target="_blank" rel="noopener">Open stream ↗</a>
+      <a class="live-alt" href="http://10.0.0.49:8080" target="_blank" rel="noopener">…or by IP (10.0.0.49:8080)</a>
     </div>
-    <div class="cam-stats">
-      <div class="stat-mini"><div class="lbl">Species</div><div class="val" id="cam-sp">—</div></div>
-      <div class="stat-mini"><div class="lbl">Sightings</div><div class="val" id="cam-ct">—</div></div>
-      <div class="stat-mini"><div class="lbl">Camera</div><div class="val" style="font-size:0.75rem;padding-top:6px">Sony A1</div></div>
-    </div>
-    <div style="padding:0 20px 8px"><input id="cam-filter" class="cam-filter" placeholder="🔍 filter by species…" list="species-opts" autocomplete="off" oninput="renderCamera()"></div>
-    <div id="cam-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
-    <div class="cam-grid" id="cam-feed"></div>
-  </div>
-
-  <div class="tab-pane" id="tab-review">
-    <div class="review-bulk" id="review-bulk" style="display:none">
-      <span class="rb-grp">Approve ≥ <input id="appr-thr" class="rb-thr" type="number" value="92" min="0" max="100" inputmode="numeric">%
-        <button class="rb-btn rb-appr" onclick="bulkApprove()">Approve</button></span>
-      <span class="rb-grp">Reject &lt; <input id="rej-thr" class="rb-thr" type="number" value="50" min="0" max="100" inputmode="numeric">%
-        <button class="rb-btn rb-rej" onclick="bulkReject()">Reject</button></span>
-      <span class="rb-grp">Reject species <input id="rej-sp" class="rb-sp" list="species-opts" placeholder="e.g. woodpecker" autocomplete="off">
-        <button class="rb-btn rb-rej" onclick="bulkRejectSpecies()">Reject</button></span>
-      <button class="rb-btn rb-rej" onclick="bulkRejectAll()">Reject ALL</button>
-    </div>
-    <div id="review-loading" class="loading-wrap" style="display:none"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div>
-    <div class="cam-grid" id="review-feed"></div>
   </div>
 </div>
 
@@ -580,7 +591,7 @@ let currentMonthSpecies=new Set();
 let feedPage=0; const FEED_PAGE_SIZE=60;
 let cameraLoaded=false;
 let camDets=[], camIds=new Set();
-let activeTab='activity';
+let activeTab='sightings';
 
 const $=id=>document.getElementById(id);
 function setStatus(t,m){$('sdot').className='sdot '+t;$('stxt').textContent=m}
@@ -688,9 +699,8 @@ function buildAll(){
   buildHero();
   buildRecent();
   buildBotd(f);
-  if(activeTab==='activity'){buildHourly(f);buildTopSp(f);}
-  if(activeTab==='species')buildSpeciesList(f);
-  if(activeTab==='feed'){feedPage=0;buildFeed(f);}
+  // Audio tab now holds all acoustic views in one pane — build them together.
+  buildHourly(f); buildTopSp(f); buildSpeciesList(f); feedPage=0; buildFeed(f);
 }
 
 // === HERO ===
@@ -703,39 +713,22 @@ function buildHero(){
   $('h-peak').textContent=today.length?fmtHour(peak):'—';
   $('h-allsp').textContent=new Set(allDetections.map(d=>d.cn)).size||'—';
 }
-function heroClickSpecies(){
-  timeFilter='24h';
+function _setChip(label){
   [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
-  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
-  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Species');
-  if(btn)switchTab('species',btn);
+  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent===label)?.classList.add('active');
 }
-function heroClickDets(){
-  timeFilter='24h';
-  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
-  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
-  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Feed');
-  if(btn)switchTab('feed',btn);
-}
+function heroClickSpecies(){timeFilter='24h';_setChip('24h');buildAll();}
+function heroClickDets(){timeFilter='24h';_setChip('24h');buildAll();}
 function heroClickPeak(){
   const today=allDetections.filter(d=>isToday(d.dt));
   if(!today.length)return;
   const hrs=Array(24).fill(0);today.forEach(d=>hrs[new Date(d.dt).getHours()]++);
   const peak=hrs.indexOf(Math.max(...hrs));
-  timeFilter='24h';
-  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
-  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='24h')?.classList.add('active');
-  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Activity');
-  if(btn)switchTab('activity',btn);
+  timeFilter='24h';_setChip('24h');buildAll();
   setTimeout(()=>showHourDetail(peak),100);
 }
 function heroClickAllSp(){
-  timeFilter='all';
-  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
-  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent==='All')?.classList.add('active');
-  const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent==='Species');
-  if(!btn)return;
-  switchTab('species',btn);
+  timeFilter='all';_setChip('All');
   ensureHistory().then(()=>{buildAll();setStatus('live',`${allDetections.length} detections`);});
 }
 
@@ -1202,194 +1195,153 @@ function lbSelect(i){
 function closeLightbox(){$('lb-overlay').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 
-// === CAMERA ===
-async function loadCamera(){
-  $('cam-loading').style.display='block';$('cam-feed').innerHTML='';
-  try{
-    const res=await fetch(PROXY+'/camera');
-    const data=await res.json();
-    camDets=data.detections||[];
-    camIds=new Set(camDets.map(d=>d.id));
-    camDets.forEach(d=>{lbStore[d.id]=d;});
-    ensureSpeciesList();
-    renderCamera();
-  }catch(e){$('cam-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
-  $('cam-loading').style.display='none';
-  cameraLoaded=true;
-}
-function renderCamera(){
-  const q=($('cam-filter')?$('cam-filter').value:'').trim().toLowerCase();
-  const dets=q?camDets.filter(d=>(d.common_name||'').toLowerCase().includes(q)):camDets;
-  $('cam-sp').textContent=new Set(dets.map(d=>d.common_name)).size;
-  $('cam-ct').textContent=dets.length;
-  if(!camDets.length){$('cam-feed').innerHTML='<div class="empty-state">No camera detections today</div>';return;}
-  if(!dets.length){$('cam-feed').innerHTML=`<div class="empty-state">No sightings matching "${q}"</div>`;return;}
-  $('cam-feed').innerHTML=dets.map(d=>{
-    const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
-    const conf=Math.round((d.score||0)*100);
-    const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
-    const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
-    const bdate=new Date(d.timestamp).toLocaleDateString('en-CA');
-    return `<div class="cam-card" id="cam-${d.id}">
-      <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
-      <div class="cam-info">
-        <div class="cam-species">${d.common_name}</div>
-        <div class="cam-sci">${d.species||''}</div>
-        <div class="cam-meta">
-          <span class="cam-time">${t} · ${dt}</span>
-          ${conf>0?`<span class="cam-conf">${conf}%</span>`:''}
-          ${confFlag(d)}
-        </div>
-        <div class="review-actions"><button class="btn-reject" onclick="removeCamera('${d.id}','${bdate}')">✕ Remove</button></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function removeCamera(id, date){
-  if(!confirm('Remove this confirmed sighting? Use this if it was a mistaken ID.'))return;
-  const card=$('cam-'+id);
-  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
-  try{
-    await fetch(PROXY+'/camera/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,date})});
-    camDets=camDets.filter(d=>d.id!==id);camIds.delete(id);
-    closeLightbox();renderCamera();
-  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
-}
-
-// === REVIEW ===
+// === SIGHTINGS (visual: review + confirmed, merged) ===
 let reviewLoaded=false;
-let reviewPending=[], reviewIds=new Set();
+let sightPending=[], sightConfirmed=[], reviewIds=new Set();
+let sightStatus='review';   // 'review' | 'confirmed' | 'all'
+let dhOnly=false;           // Hairy/Downy quick filter
+const DH_SET=['downy woodpecker','hairy woodpecker'];
+
 async function loadReviewCount(){
   try{
     const res=await fetch(PROXY+'/review');
-    const data=await res.json();
-    const n=(data.pending||[]).length;
+    const n=((await res.json()).pending||[]).length;
     const badge=$('review-badge');
-    if(n>0){badge.textContent=n>9?'9+':n;badge.style.display='inline-flex';}
-    else badge.style.display='none';
+    if(n>0){badge.textContent=n>9?'9+':n;badge.style.display='inline-flex';}else badge.style.display='none';
   }catch(e){}
 }
-async function loadReview(){
-  $('review-loading').style.display='block';$('review-feed').innerHTML='';
+async function loadSightings(){
+  $('sight-loading').style.display='block';
   try{
-    const res=await fetch(PROXY+'/review');
+    const res=await fetch(PROXY+'/sightings?days=7');
     const data=await res.json();
-    const pending=data.pending||[];
-    reviewPending=pending; reviewIds=new Set(pending.map(d=>d.id));
-    $('review-bulk').style.display=pending.length?'flex':'none';
-    if(!pending.length){$('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';$('review-badge').style.display='none';$('review-loading').style.display='none';reviewLoaded=true;return;}
+    sightPending=data.pending||[]; sightConfirmed=data.confirmed||[];
+    reviewIds=new Set(sightPending.map(d=>d.id)); camIds=new Set(sightConfirmed.map(d=>d.id));
+    [...sightPending,...sightConfirmed].forEach(d=>{lbStore[d.id]=d;});
     ensureSpeciesList();
-    pending.forEach(d=>{lbStore[d.id]=d;});
-    $('review-feed').innerHTML=pending.map(d=>{
-      const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
-      const conf=Math.round((d.score||0)*100);
-      const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
-      const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
-      const esc=s=>String(s).replace(/'/g,"\\'");
-      const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
-      const altHtml=alts.length?`<div class="alt-row"><span class="alt-label">or pick:</span>${alts.map(c=>`<button class="alt-chip" onclick="approveReview('${d.id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
-      return `<div class="cam-card" id="rv-${d.id}">
-        <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" alt="${d.common_name}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
-        <div class="cam-info">
-          <div class="cam-species">${d.common_name}</div>
-          <div class="cam-sci">${d.species||''}</div>
-          <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}${confFlag(d)}</div>
-          <div class="review-actions">
-            <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm ${d.common_name}</button>
-            <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
-          </div>
-          ${altHtml}
-          <div class="manual-row">
-            <input class="manual-in" id="man-${d.id}" list="species-opts" placeholder="🔍 correct species…" autocomplete="off">
-            <button class="btn-manual" onclick="approveManual('${d.id}')">Confirm as</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }catch(e){$('review-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
-  $('review-loading').style.display='none';reviewLoaded=true;
+    renderSightings();
+  }catch(e){$('sight-feed').innerHTML=`<div class="error-msg">Could not load: ${e.message}</div>`;}
+  $('sight-loading').style.display='none';
+  reviewLoaded=true;
 }
-function checkReviewEmpty(){
-  if(!$('review-feed').querySelectorAll('.cam-card').length){
-    $('review-feed').innerHTML='<div class="empty-state">All caught up — no pending reviews</div>';
-    $('review-badge').style.display='none';
+function setSightStatus(s,btn){
+  sightStatus=s;
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderSightings();
+}
+function toggleDownyHairy(){
+  dhOnly=!dhOnly;
+  $('dh-btn').classList.toggle('active',dhOnly);
+  if(dhOnly)$('sight-filter').value='';
+  renderSightings();
+}
+function sightMatch(d){
+  if(dhOnly) return DH_SET.includes((d.common_name||'').toLowerCase());
+  const q=($('sight-filter')?$('sight-filter').value:'').trim().toLowerCase();
+  return !q || (d.common_name||'').toLowerCase().includes(q);
+}
+function reviewCardHTML(d){
+  const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+  const conf=Math.round((d.score||0)*100);
+  const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+  const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
+  const esc=s=>String(s).replace(/'/g,"\\'");
+  const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
+  const altHtml=alts.length?`<div class="alt-row"><span class="alt-label">or pick:</span>${alts.map(c=>`<button class="alt-chip" onclick="approveReview('${d.id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
+  return `<div class="cam-card" id="rv-${d.id}">
+    <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+    <div class="cam-info">
+      <div class="cam-species">${d.common_name}</div>
+      <div class="cam-sci">${d.species||''}</div>
+      <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}${confFlag(d)}<span class="status-tag tag-pending">needs review</span></div>
+      <div class="review-actions">
+        <button class="btn-approve" onclick="approveReview('${d.id}')">✓ Confirm ${d.common_name}</button>
+        <button class="btn-reject" onclick="rejectReview('${d.id}')">✕ Reject</button>
+      </div>
+      ${altHtml}
+      <div class="manual-row"><input class="manual-in" id="man-${d.id}" list="species-opts" placeholder="🔍 correct species…" autocomplete="off"><button class="btn-manual" onclick="approveManual('${d.id}')">Confirm as</button></div>
+    </div>
+  </div>`;
+}
+function confirmedCardHTML(d){
+  const t=new Date(d.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const dt=new Date(d.timestamp).toLocaleDateString([],{month:'short',day:'numeric'});
+  const conf=Math.round((d.score||0)*100);
+  const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+  const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
+  const bdate=new Date(d.timestamp).toLocaleDateString('en-CA');
+  return `<div class="cam-card" id="cam-${d.id}">
+    <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+    <div class="cam-info">
+      <div class="cam-species">${d.common_name}</div>
+      <div class="cam-sci">${d.species||''}</div>
+      <div class="cam-meta"><span class="cam-time">${t} · ${dt}</span>${conf>0?`<span class="cam-conf">${conf}%</span>`:''}${confFlag(d)}<span class="status-tag tag-ok">confirmed</span></div>
+      <div class="review-actions"><button class="btn-reject" onclick="removeCamera('${d.id}','${bdate}')">✕ Remove</button></div>
+    </div>
+  </div>`;
+}
+function renderSightings(){
+  const pend=sightPending.filter(sightMatch), conf=sightConfirmed.filter(sightMatch);
+  $('review-bulk').style.display=(sightStatus!=='confirmed'&&sightPending.length)?'flex':'none';
+  let html='';
+  if(sightStatus!=='confirmed') html+=pend.map(reviewCardHTML).join('');
+  if(sightStatus!=='review')   html+=conf.map(confirmedCardHTML).join('');
+  if(!html){
+    const filt=(dhOnly||($('sight-filter')&&$('sight-filter').value.trim()));
+    const what=sightStatus==='confirmed'?'confirmed sightings':sightStatus==='review'?'items need review':'sightings';
+    html=`<div class="empty-state">No ${what}${filt?' match this filter':''}.</div>`;
   }
+  $('sight-feed').innerHTML=html;
 }
 async function approveReview(id, overrideName){
-  const card=$('rv-'+id);
-  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
   try{
-    const body={id};
-    if(overrideName) body.common_name=overrideName;
+    const body={id}; if(overrideName) body.common_name=overrideName;
     await fetch(PROXY+'/review/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(card)card.remove();
-    loadReviewCount();checkReviewEmpty();
-  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
+    sightPending=sightPending.filter(d=>d.id!==id); reviewIds.delete(id);
+    closeLightbox(); renderSightings(); loadReviewCount();
+  }catch(e){alert('Error: '+e.message);}
 }
 function approveManual(id){
-  const el=$('man-'+id);
-  const v=el?el.value.trim():'';
+  const el=$('man-'+id); const v=el?el.value.trim():'';
   if(!v){if(el)el.focus();return;}
   approveReview(id, v);
 }
+async function rejectReview(id){
+  try{
+    await fetch(PROXY+'/review/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    sightPending=sightPending.filter(d=>d.id!==id); reviewIds.delete(id);
+    closeLightbox(); renderSightings(); loadReviewCount();
+  }catch(e){alert('Error: '+e.message);}
+}
+async function removeCamera(id, date){
+  if(!confirm('Remove this confirmed sighting? Use this if it was a mistaken ID.'))return;
+  try{
+    await fetch(PROXY+'/camera/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,date})});
+    sightConfirmed=sightConfirmed.filter(d=>d.id!==id); camIds.delete(id);
+    closeLightbox(); renderSightings();
+  }catch(e){alert('Error: '+e.message);}
+}
 async function bulkApprove(){
   const thr=Math.max(0,Math.min(100,parseFloat($('appr-thr').value)||92));
-  const n=reviewPending.filter(d=>(d.score||0)*100>=thr).length;
+  const n=sightPending.filter(d=>(d.score||0)*100>=thr).length;
   if(!n){alert(`No pending items ≥ ${thr}%`);return;}
   if(!confirm(`Approve ${n} sighting${n>1?'s':''} at ≥ ${thr}% confidence?`))return;
-  try{
-    const r=await fetch(PROXY+'/review/approve-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_score:thr/100})});
-    const j=await r.json();
-    await loadReview();loadReviewCount();
-    alert(`Approved ${j.approved}. ${j.remaining} left to review.`);
-  }catch(e){alert('Error: '+e.message);}
+  try{const r=await fetch(PROXY+'/review/approve-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_score:thr/100})});const j=await r.json();await loadSightings();loadReviewCount();alert(`Approved ${j.approved}. ${j.remaining} left to review.`);}catch(e){alert('Error: '+e.message);}
 }
 async function bulkReject(){
   const thr=Math.max(0,Math.min(100,parseFloat($('rej-thr').value)||50));
-  const n=reviewPending.filter(d=>(d.score||0)*100<thr).length;
+  const n=sightPending.filter(d=>(d.score||0)*100<thr).length;
   if(!n){alert(`No pending items < ${thr}%`);return;}
-  if(!confirm(`Reject (discard) ${n} sighting${n>1?'s':''} below ${thr}% confidence? This can't be undone.`))return;
-  try{
-    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:thr/100})});
-    const j=await r.json();
-    await loadReview();loadReviewCount();
-    alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);
-  }catch(e){alert('Error: '+e.message);}
-}
-async function bulkRejectSpecies(){
-  const q=($('rej-sp').value||'').trim();
-  if(!q){$('rej-sp').focus();return;}
-  const n=reviewPending.filter(d=>(d.common_name||'').toLowerCase().includes(q.toLowerCase())).length;
-  if(!n){alert(`No pending items matching "${q}"`);return;}
-  if(!confirm(`Reject ${n} pending sighting${n>1?'s':''} matching "${q}"? This can't be undone.`))return;
-  try{
-    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({species_contains:q})});
-    const j=await r.json();
-    await loadReview();loadReviewCount();
-    alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);
-  }catch(e){alert('Error: '+e.message);}
+  if(!confirm(`Reject ${n} sighting${n>1?'s':''} below ${thr}% confidence? This can't be undone.`))return;
+  try{const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:thr/100})});const j=await r.json();await loadSightings();loadReviewCount();alert(`Rejected ${j.rejected}. ${j.remaining} left to review.`);}catch(e){alert('Error: '+e.message);}
 }
 async function bulkRejectAll(){
-  const n=reviewPending.length;
-  if(!n)return;
-  if(!confirm(`Reject ALL ${n} pending sightings? This clears the entire queue and can't be undone.`))return;
-  try{
-    const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:1.01})});
-    const j=await r.json();
-    await loadReview();loadReviewCount();
-    alert(`Rejected ${j.rejected}. Queue cleared.`);
-  }catch(e){alert('Error: '+e.message);}
-}
-async function rejectReview(id){
-  const card=$('rv-'+id);
-  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';}
-  try{
-    await fetch(PROXY+'/review/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-    if(card)card.remove();
-    loadReviewCount();checkReviewEmpty();
-  }catch(e){if(card){card.style.opacity='1';card.style.pointerEvents='auto';}alert('Error: '+e.message);}
+  const total=sightPending.length;
+  if(!total)return;
+  if(!confirm(`Reject ALL ${total} pending sightings? This clears the queue and can't be undone.`))return;
+  try{const r=await fetch(PROXY+'/review/reject-bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({max_score:1.01})});const j=await r.json();await loadSightings();loadReviewCount();alert(`Rejected ${j.rejected}. Queue cleared.`);}catch(e){alert('Error: '+e.message);}
 }
 
 // === FILTERS ===
@@ -1421,12 +1373,8 @@ function switchTab(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   $('tab-'+name).classList.add('active');btn.classList.add('active');
   activeTab=name;
-  const f=filteredDets();
-  if(name==='activity'){buildHourly(f);buildTopSp(f);}
-  if(name==='species')buildSpeciesList(f);
-  if(name==='feed'){feedPage=0;buildFeed(f);}
-  if(name==='camera'&&!cameraLoaded)loadCamera();
-  if(name==='review'&&!reviewLoaded)loadReview();
+  if(name==='sightings')loadSightings();
+  if(name==='audio')buildAll();
 }
 
 // === CALENDAR ===
@@ -1490,6 +1438,7 @@ async function init(){
     $('loading').style.display='none';
     $('app').style.display='block';
     buildAll();
+    loadSightings();   // default tab
     setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} recent`);
     // Load history in background
     setTimeout(()=>{
