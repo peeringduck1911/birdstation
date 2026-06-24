@@ -429,7 +429,17 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   <div class="tab-pane" id="tab-live">
     <div class="live-head">
       <span>🔴 Live at the feeder <span class="live-auto">· auto-refreshing</span></span>
-      <a class="live-open" href="http://raspberrypi.local:8080" target="_blank" rel="noopener">▶ Watch stream ↗</a>
+      <a class="live-open" href="https://stream.pamtexbirdstationstreams.com/" target="_blank" rel="noopener">⛶ Fullscreen ↗</a>
+    </div>
+    <style>.live-player.offline #live-stream{display:none}.live-player.offline .live-offline{display:flex!important}</style>
+    <div class="live-player" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;margin-bottom:14px">
+      <img id="live-stream" alt="Live feeder stream"
+           style="width:100%;height:100%;object-fit:contain;display:block"
+           onerror="this.closest('.live-player').classList.add('offline')">
+      <div class="live-offline" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:#888;font-size:14px;text-align:center;padding:20px">
+        Stream offline — the Pi or camera may be down.<br>
+        <a href="https://stream.pamtexbirdstationstreams.com/" target="_blank" rel="noopener" style="color:#6cf">Open directly ↗</a>
+      </div>
     </div>
     <div id="live-body" class="live-body"><div class="loading-wrap"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div></div>
   </div>
@@ -1411,6 +1421,18 @@ function setConf(f,btn){
   btn.classList.add('active');buildAll();
 }
 
+// === LIVE STREAM EMBED ===
+const STREAM_URL='https://stream.pamtexbirdstationstreams.com/stream';
+function startLiveStream(){
+  const img=$('live-stream');if(!img)return;
+  img.closest('.live-player').classList.remove('offline');
+  img.src=STREAM_URL+'?t='+Date.now(); // cache-bust so it reconnects fresh
+}
+function stopLiveStream(){
+  const img=$('live-stream');if(!img)return;
+  img.src=''; // drop the MJPEG connection when off the Live tab
+}
+
 // === TABS ===
 function switchTab(name,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
@@ -1418,9 +1440,10 @@ function switchTab(name,btn){
   $('tab-'+name).classList.add('active');btn.classList.add('active');
   activeTab=name;
   if(name!=='live'&&liveTimer){clearInterval(liveTimer);liveTimer=null;}
+  if(name!=='live')stopLiveStream();
   if(name==='sightings')loadSightings();
   if(name==='audio')buildAll();
-  if(name==='live'){loadLiveTally();clearInterval(liveTimer);liveTimer=setInterval(loadLiveTally,20000);}
+  if(name==='live'){startLiveStream();loadLiveTally();clearInterval(liveTimer);liveTimer=setInterval(loadLiveTally,20000);}
 }
 
 // === CALENDAR ===
