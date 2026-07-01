@@ -1443,13 +1443,13 @@ function streamOffline(){                 // stream errored (e.g. Orin service r
   const el=$('live-stream');if(!el)return;
   el.closest('.live-player').classList.add('offline');
   if(streamRetry||activeTab!=='live')return;   // already retrying / not on Live tab
-  streamRetry=setInterval(()=>{                 // self-heal: retry every 10s while offline
+  streamRetry=setInterval(()=>{                 // self-heal: retry every 5s while offline
     const img=$('live-stream');
     if(activeTab!=='live'||!img.closest('.live-player').classList.contains('offline')){
       clearInterval(streamRetry);streamRetry=null;return; // left tab, or recovered
     }
-    img.src=STREAM_URL+'?t='+Date.now();
-  },10000);
+    startLiveStream(); // clears the offline overlay + loads a fresh src; onerror re-adds it only if still down
+  },5000);
 }
 
 // === TABS ===
