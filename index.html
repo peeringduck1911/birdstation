@@ -435,9 +435,9 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <div class="live-player" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;margin-bottom:14px">
       <img id="live-stream" alt="Live feeder stream"
            style="width:100%;height:100%;object-fit:contain;display:block"
-           onerror="this.closest('.live-player').classList.add('offline')">
+           onload="streamOnline()" onerror="streamOffline()">
       <div class="live-offline" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:#888;font-size:14px;text-align:center;padding:20px">
-        Stream offline — the Pi or camera may be down.<br>
+        Reconnecting to stream… (the feed may be restarting)<br>
         <a href="https://stream.pamtexbirdstationstreams.com/" target="_blank" rel="noopener" style="color:#6cf">Open directly ↗</a>
       </div>
     </div>
@@ -1423,6 +1423,7 @@ function setConf(f,btn){
 
 // === LIVE STREAM EMBED ===
 const STREAM_URL='https://stream.pamtexbirdstationstreams.com/stream';
+let streamRetry=null;
 function startLiveStream(){
   const img=$('live-stream');if(!img)return;
   img.closest('.live-player').classList.remove('offline');
@@ -1430,7 +1431,25 @@ function startLiveStream(){
 }
 function stopLiveStream(){
   const img=$('live-stream');if(!img)return;
+  if(streamRetry){clearInterval(streamRetry);streamRetry=null;}
   img.src=''; // drop the MJPEG connection when off the Live tab
+}
+function streamOnline(){                 // a frame loaded → stream is live
+  const img=$('live-stream');if(!img||!img.src)return;
+  img.closest('.live-player').classList.remove('offline');
+  if(streamRetry){clearInterval(streamRetry);streamRetry=null;}
+}
+function streamOffline(){                 // stream errored (e.g. Orin service restarting)
+  const el=$('live-stream');if(!el)return;
+  el.closest('.live-player').classList.add('offline');
+  if(streamRetry||activeTab!=='live')return;   // already retrying / not on Live tab
+  streamRetry=setInterval(()=>{                 // self-heal: retry every 10s while offline
+    const img=$('live-stream');
+    if(activeTab!=='live'||!img.closest('.live-player').classList.contains('offline')){
+      clearInterval(streamRetry);streamRetry=null;return; // left tab, or recovered
+    }
+    img.src=STREAM_URL+'?t='+Date.now();
+  },10000);
 }
 
 // === TABS ===
