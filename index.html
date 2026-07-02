@@ -325,6 +325,36 @@ header{background:var(--paper);border-bottom:1px solid rgba(26,26,20,0.12);paddi
 .cal-clear{width:100%;background:none;border:1px solid rgba(26,26,20,0.15);border-radius:6px;padding:8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:rgba(26,26,20,0.45);cursor:pointer;margin-top:4px}
 
 footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);letter-spacing:.06em}
+
+/* Combined feed timeline */
+.feed-timeline{padding:0 16px 24px}
+.feed-day{margin-top:14px}
+.feed-day-hdr{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,26,20,.4);padding:6px 4px;position:sticky;top:0;background:var(--bg,#f4f2ea);z-index:1}
+.feed-row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid rgba(26,26,20,.06)}
+.feed-row.sight{cursor:zoom-in}
+.feed-time{font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(26,26,20,.45);width:52px;flex-shrink:0;text-align:right}
+.feed-ico{font-size:0.95rem;width:20px;text-align:center;flex-shrink:0}
+.feed-thumb{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--mist);flex-shrink:0}
+.feed-main{flex:1;min-width:0}
+.feed-name{font-size:0.82rem;font-weight:500;color:var(--ink,#1a1a14);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-sci{font-size:0.6rem;font-style:italic;color:rgba(26,26,20,.4)}
+.feed-right{flex-shrink:0;display:flex;align-items:center;gap:6px}
+.feed-pct{font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(26,26,20,.5)}
+.feed-rare{font-size:0.5rem;letter-spacing:.08em;text-transform:uppercase;background:#e8b04b;color:#3a2c08;padding:2px 5px;border-radius:4px}
+
+/* Sightings review: inline whole-bird thumbnail strip (no click-to-zoom needed) */
+.cam-thumbs{display:flex;gap:5px;flex-wrap:wrap;padding:8px 0 2px}
+.cam-thumbs img{width:74px;height:60px;object-fit:cover;border-radius:5px;background:var(--mist);cursor:zoom-in;border:1px solid rgba(26,26,20,.08)}
+.cam-card.stacked{flex-direction:column}
+.cam-card.stacked .cam-info{padding:10px 12px 12px}
+
+/* Live observation feed */
+.live-feed{margin-top:16px}
+.live-feed-hdr{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,20,.45);margin-bottom:6px}
+.live-obs{display:flex;align-items:center;gap:9px;padding:6px 4px;border-bottom:1px solid rgba(26,26,20,.06)}
+.live-obs img{width:38px;height:38px;border-radius:5px;object-fit:cover;background:var(--mist);cursor:zoom-in}
+.live-obs .lo-t{font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(26,26,20,.45);width:52px;text-align:right;flex-shrink:0}
+.live-obs .lo-n{flex:1;font-size:0.78rem}
 </style>
 </head>
 <body>
@@ -345,9 +375,28 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('audio',this)">🎵 Audio</button>
+    <button class="tab-btn active" onclick="switchTab('feed',this)">🐦 Feed</button>
+    <button class="tab-btn" onclick="switchTab('explore',this)">📊 Explore</button>
     <button class="tab-btn" onclick="switchTab('sightings',this)">📷 Sightings<span class="review-badge" id="review-badge" style="display:none"></span></button>
     <button class="tab-btn" onclick="switchTab('live',this)">🔴 Live</button>
+  </div>
+
+  <!-- FEED — combined chronological timeline of sightings + audio IDs -->
+  <div class="tab-pane active" id="tab-feed">
+    <div class="filter-bar">
+      <button class="chip ftime" onclick="setFeedTime('1h',this)">1h</button>
+      <button class="chip ftime" onclick="setFeedTime('12h',this)">12h</button>
+      <button class="chip ftime active" onclick="setFeedTime('24h',this)">24h</button>
+      <button class="chip ftime" onclick="setFeedTime('week',this)">Week</button>
+      <button class="chip ftime" onclick="setFeedTime('month',this)">Month</button>
+      <button class="chip ftime" onclick="setFeedTime('all',this)">All</button>
+      <button class="chip" id="feed-cal-chip" onclick="openCalFor('feed')">📅 Date</button>
+      <div class="filter-sep"></div>
+      <button class="chip fsrc active" onclick="setFeedSrc('all',this)">All</button>
+      <button class="chip fsrc" onclick="setFeedSrc('sight',this)">📷 Sightings</button>
+      <button class="chip fsrc" onclick="setFeedSrc('audio',this)">🎵 Audio</button>
+    </div>
+    <div id="feed-timeline" class="feed-timeline"><div class="loading-wrap"><div class="dots"><span>·</span><span>·</span><span>·</span></div></div></div>
   </div>
 
   <!-- SIGHTINGS — visual review + confirmed, merged -->
@@ -374,8 +423,8 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
     <div class="cam-grid" id="sight-feed"></div>
   </div>
 
-  <!-- AUDIO — Haikubox acoustic detections -->
-  <div class="tab-pane active" id="tab-audio">
+  <!-- EXPLORE — deeper-dive analytics (audio-driven) -->
+  <div class="tab-pane" id="tab-explore">
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-stat" onclick="heroClickSpecies()"><div class="val" id="h-species">—</div><div class="lbl">species today</div></div>
@@ -391,11 +440,6 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
         <div><div class="botd-count" id="botd-count">0</div><div class="botd-count-lbl">detections<br><span id="botd-period">today</span></div></div>
       </div>
     </div>
-    <div class="section-header">
-      <span class="section-title">Recently Heard</span>
-      <span class="section-sub" id="recent-sub"></span>
-    </div>
-    <div class="recent-scroll" id="recent-scroll"></div>
     <div class="filter-bar">
       <button class="chip" onclick="setTime('1h',this)">1h</button>
       <button class="chip" onclick="setTime('12h',this)">12h</button>
@@ -404,7 +448,7 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <button class="chip" onclick="setTime('month',this)">Month</button>
       <button class="chip" onclick="setTime('year',this)">Year</button>
       <button class="chip" onclick="setTime('all',this)">All</button>
-      <button class="chip" id="cal-chip" onclick="openCal()">📅 Date</button>
+      <button class="chip" id="cal-chip" onclick="openCalFor('explore')">📅 Date</button>
       <div class="filter-sep"></div>
       <button class="chip active" onclick="setConf('all',this)">All conf</button>
       <button class="chip" onclick="setConf('high',this)">High</button>
@@ -419,10 +463,6 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div id="top-sp"></div>
     </div>
     <div class="sp-list-wrap" id="sp-list"></div>
-    <div class="feed-wrap" id="feed-list"></div>
-    <div class="load-more-wrap" id="load-more-wrap" style="display:none">
-      <button class="load-more-btn" onclick="loadMoreFeed()">Load more</button>
-    </div>
   </div>
 
   <!-- LIVE — MJPEG camera stream -->
@@ -611,7 +651,7 @@ let currentMonthSpecies=new Set();
 let feedPage=0; const FEED_PAGE_SIZE=60;
 let cameraLoaded=false;
 let camDets=[], camIds=new Set();
-let activeTab='audio';
+let activeTab='feed';
 let liveTimer=null;
 
 const $=id=>document.getElementById(id);
@@ -706,6 +746,71 @@ function filteredDets(){
   return filterByTime(allDetections,timeFilter).filter(d=>passConf(d.score));
 }
 
+// === COMBINED FEED (Feed tab: chronological sightings + audio IDs) ===
+let feedRange='24h', feedSrc='all', feedCalDate=null, calTarget='explore';
+function feedItems(){
+  const items=[];
+  if(feedSrc!=='sight') allDetections.forEach(d=>items.push({kind:'audio',dt:d.dt,name:d.cn,sci:d.sn,score:d.score}));
+  if(feedSrc!=='audio') (sightConfirmed||[]).forEach(d=>items.push({kind:'sight',dt:d.timestamp,name:d.common_name,sci:d.species,score:d.score,id:d.id,photo_key:d.photo_key}));
+  return items;
+}
+function feedRangeFilter(items){
+  if(feedCalDate) return items.filter(it=>new Date(it.dt).toLocaleDateString('en-CA')===feedCalDate);
+  return filterByTime(items, feedRange);
+}
+function feedDayLabel(d){
+  const day=new Date(d);day.setHours(0,0,0,0);
+  const t=new Date();t.setHours(0,0,0,0);
+  const diff=Math.round((t-day)/86400000);
+  if(diff===0)return'Today'; if(diff===1)return'Yesterday';
+  return new Date(d).toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
+}
+function feedRowHTML(it){
+  const t=new Date(it.dt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  const pct=it.score?Math.round(it.score*100)+'%':'';
+  const rare=isRare(it.name)?'<span class="feed-rare">rare</span>':'';
+  if(it.kind==='sight'){
+    const url=it.photo_key?`${PROXY}/photo/${it.photo_key}`:null;
+    return `<div class="feed-row sight" ${it.id?`onclick="openLightbox('${it.id}')"`:''}>
+      <span class="feed-time">${t}</span>
+      ${url?`<img class="feed-thumb" src="${url}" loading="lazy" onerror="this.style.visibility='hidden'">`:'<span class="feed-ico">📷</span>'}
+      <div class="feed-main"><div class="feed-name">📷 ${it.name}${rare}</div><div class="feed-sci">${it.sci||''}</div></div>
+      <div class="feed-right">${pct?`<span class="feed-pct">${pct}</span>`:''}</div></div>`;
+  }
+  return `<div class="feed-row">
+    <span class="feed-time">${t}</span>
+    <span class="feed-ico">🎵</span>
+    <div class="feed-main"><div class="feed-name">${it.name}${rare}</div><div class="feed-sci">${it.sci||''}</div></div>
+    <div class="feed-right">${pct?`<span class="feed-pct">${pct}</span>`:''}</div></div>`;
+}
+function buildFeedTimeline(){
+  const el=$('feed-timeline'); if(!el)return;
+  let items=feedRangeFilter(feedItems());
+  items.sort((a,b)=>new Date(b.dt)-new Date(a.dt));
+  if(!items.length){el.innerHTML=`<div class="empty-state">No activity for ${feedCalDate?feedCalDate:labelFor(feedRange)}.</div>`;return;}
+  const groups=[];let curKey=null,cur=null;
+  items.forEach(it=>{
+    const k=new Date(it.dt).toLocaleDateString('en-CA');
+    if(k!==curKey){curKey=k;cur={label:feedDayLabel(it.dt),items:[]};groups.push(cur);}
+    cur.items.push(it);
+  });
+  el.innerHTML=groups.map(g=>`<div class="feed-day"><div class="feed-day-hdr">${g.label}</div>${g.items.map(feedRowHTML).join('')}</div>`).join('');
+}
+function setFeedTime(f,btn){
+  feedRange=f; feedCalDate=null;
+  $('feed-cal-chip').textContent='📅 Date'; $('feed-cal-chip').classList.remove('active');
+  document.querySelectorAll('#tab-feed .ftime').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  if(['week','month','all'].includes(f)&&!historyPromise){ensureHistory().then(buildFeedTimeline);}
+  buildFeedTimeline();
+}
+function setFeedSrc(s,btn){
+  feedSrc=s;
+  document.querySelectorAll('#tab-feed .fsrc').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  buildFeedTimeline();
+}
+
 // === STREAK ===
 function calcStreak(){
   const dates=new Set(allDetections.map(d=>new Date(d.dt).toDateString()));
@@ -714,14 +819,12 @@ function calcStreak(){
   return streak;
 }
 
-// === BUILD ALL ===
+// === BUILD ALL (Explore tab: deeper-dive analytics) ===
 function buildAll(){
   const f=filteredDets();
   buildHero();
-  buildRecent();
   buildBotd(f);
-  // Audio tab now holds all acoustic views in one pane — build them together.
-  buildHourly(f); buildTopSp(f); buildSpeciesList(f); feedPage=0; buildFeed(f);
+  buildHourly(f); buildTopSp(f); buildSpeciesList(f);
 }
 
 // === HERO ===
@@ -735,8 +838,8 @@ function buildHero(){
   $('h-allsp').textContent=new Set(allDetections.map(d=>d.cn)).size||'—';
 }
 function _setChip(label){
-  [...document.querySelectorAll('.filter-bar .chip')].forEach(c=>c.classList.remove('active'));
-  [...document.querySelectorAll('.filter-bar .chip')].find(c=>c.textContent===label)?.classList.add('active');
+  [...document.querySelectorAll('#tab-explore .filter-bar .chip')].forEach(c=>c.classList.remove('active'));
+  [...document.querySelectorAll('#tab-explore .filter-bar .chip')].find(c=>c.textContent===label)?.classList.add('active');
 }
 function heroClickSpecies(){timeFilter='24h';_setChip('24h');buildAll();}
 function heroClickDets(){timeFilter='24h';_setChip('24h');buildAll();}
@@ -921,7 +1024,7 @@ function buildHeatmap(){
 }
 function selectDay(iso){
   calSelectedDate=iso;timeFilter='day:'+iso;
-  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#tab-explore .filter-bar .chip').forEach(c=>c.classList.remove('active'));
   const d=new Date(iso+'T12:00');
   $('cal-chip').textContent='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
   $('cal-chip').classList.add('active');
@@ -1205,6 +1308,12 @@ function openLightbox(id){
   }
   $('lb-overlay').classList.add('open');
 }
+function openLightboxAt(id,i){openLightbox(id);lbSelect(i);}
+function cardThumbsHTML(d){
+  const imgs=lbImages(d);   // wide (whole-bird) crops first, tight crop last
+  if(!imgs.length) return `<div class="cam-thumbs"><span style="font-size:2rem">🐦</span></div>`;
+  return `<div class="cam-thumbs">${imgs.slice(0,8).map((u,i)=>`<img src="${u}" loading="lazy" onclick="openLightboxAt('${d.id}',${i})" onerror="this.style.display='none'">`).join('')}</div>`;
+}
 function lbApprove(id,name){approveReview(id,name);closeLightbox();}
 function lbReject(id){rejectReview(id);closeLightbox();}
 function lbApproveManual(id){const v=($('lb-man')?$('lb-man').value.trim():'');if(!v){if($('lb-man'))$('lb-man').focus();return;}approveReview(id,v);closeLightbox();}
@@ -1234,7 +1343,7 @@ async function loadReviewCount(){
 async function loadSightings(){
   $('sight-loading').style.display='block';
   try{
-    const res=await fetch(PROXY+'/sightings?days=7');
+    const res=await fetch(PROXY+'/sightings?days=30');
     const data=await res.json();
     sightPending=data.pending||[]; sightConfirmed=data.confirmed||[];
     reviewIds=new Set(sightPending.map(d=>d.id)); camIds=new Set(sightConfirmed.map(d=>d.id));
@@ -1271,8 +1380,8 @@ function reviewCardHTML(d){
   const esc=s=>String(s).replace(/'/g,"\\'");
   const alts=(d.candidates||[]).filter(c=>c.name&&c.name!==d.common_name).slice(0,4);
   const altHtml=alts.length?`<div class="alt-row"><span class="alt-label">or pick:</span>${alts.map(c=>`<button class="alt-chip" onclick="approveReview('${d.id}','${esc(c.name)}')">${c.name}${c.score?` <span class="alt-pct">${Math.round(c.score*100)}%</span>`:''}</button>`).join('')}</div>`:'';
-  return `<div class="cam-card" id="rv-${d.id}">
-    <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+  return `<div class="cam-card stacked" id="rv-${d.id}">
+    ${cardThumbsHTML(d)}
     <div class="cam-info">
       <div class="cam-species">${d.common_name}</div>
       <div class="cam-sci">${d.species||''}</div>
@@ -1293,8 +1402,8 @@ function confirmedCardHTML(d){
   const photoUrl=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
   const clk=photoUrl?` clickable" onclick="openLightbox('${d.id}')`:'"';
   const bdate=new Date(d.timestamp).toLocaleDateString('en-CA');
-  return `<div class="cam-card" id="cam-${d.id}">
-    <div class="cam-thumb${clk}">${photoUrl?`<img src="${photoUrl}" loading="lazy" onerror="this.style.display='none'">`:''}<span style="${photoUrl?'display:none':''}">🐦</span></div>
+  return `<div class="cam-card stacked" id="cam-${d.id}">
+    ${cardThumbsHTML(d)}
     <div class="cam-info">
       <div class="cam-species">${d.common_name}</div>
       <div class="cam-sci">${d.species||''}</div>
@@ -1395,13 +1504,26 @@ function renderLiveTally(today){
   }
   html+=`<div class="tally-title">Today's tally</div>`;
   html+= ranked.length ? ranked.map(([sp,n])=>`<div class="tally-row"><span class="tally-name">${sp}</span><span class="tally-bar"><span class="tally-fill" style="width:${Math.round(n/max*100)}%"></span></span><span class="tally-n">${n}</span></div>`).join('') : '<div class="empty-state">No sightings yet today — check back soon.</div>';
+  // Running observation feed (newest first, with timestamps)
+  if(today.length){
+    html+=`<div class="live-feed"><div class="live-feed-hdr">Observations</div>`;
+    html+=today.map(d=>{
+      const tm=new Date(d.timestamp).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+      const url=d.photo_key?`${PROXY}/photo/${d.photo_key}`:null;
+      return `<div class="live-obs" ${d.id?`onclick="openLightbox('${d.id}')"`:''}>
+        <span class="lo-t">${tm}</span>
+        ${url?`<img src="${url}" loading="lazy" onerror="this.style.visibility='hidden'">`:'<span style="width:38px;text-align:center">🐦</span>'}
+        <span class="lo-n">${d.common_name}</span></div>`;
+    }).join('');
+    html+=`</div>`;
+  }
   $('live-body').innerHTML=html;
 }
 
 // === FILTERS ===
 async function setTime(f,btn){
   timeFilter=f;calSelectedDate=null;
-  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#tab-explore .filter-bar .chip').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
   $('cal-chip').textContent='📅 Date';
   if(['week','month','year','all'].includes(f)&&!historyPromise){
@@ -1415,7 +1537,7 @@ async function setTime(f,btn){
 }
 function setConf(f,btn){
   confFilter=f;
-  document.querySelectorAll('.filter-bar .chip:not(#cal-chip)').forEach(c=>{
+  document.querySelectorAll('#tab-explore .filter-bar .chip:not(#cal-chip)').forEach(c=>{
     if(['All conf','High','Med+'].includes(c.textContent))c.classList.remove('active');
   });
   btn.classList.add('active');buildAll();
@@ -1460,13 +1582,15 @@ function switchTab(name,btn){
   activeTab=name;
   if(name!=='live'&&liveTimer){clearInterval(liveTimer);liveTimer=null;}
   if(name!=='live')stopLiveStream();
+  if(name==='feed')buildFeedTimeline();
+  if(name==='explore')buildAll();
   if(name==='sightings')loadSightings();
-  if(name==='audio')buildAll();
   if(name==='live'){startLiveStream();loadLiveTally();clearInterval(liveTimer);liveTimer=setInterval(loadLiveTally,20000);}
 }
 
 // === CALENDAR ===
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+function openCalFor(target){calTarget=target;openCal();}
 function openCal(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();renderCal();$('cal-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeCal(){$('cal-overlay').classList.remove('open');document.body.style.overflow='';}
 function handleCalClick(e){if(e.target===$('cal-overlay'))closeCal();}
@@ -1489,16 +1613,22 @@ function renderCal(){
   grid.insertAdjacentHTML('beforeend',html);
 }
 function pickDay(ds){
-  calSelectedDate=ds;timeFilter='day:'+ds;
-  document.querySelectorAll('.filter-bar .chip').forEach(c=>c.classList.remove('active'));
   const d=new Date(ds+'T12:00');
-  $('cal-chip').textContent='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
-  $('cal-chip').classList.add('active');
+  const lbl='📅 '+d.toLocaleDateString([],{month:'short',day:'numeric'});
+  if(calTarget==='feed'){
+    feedCalDate=ds;
+    document.querySelectorAll('#tab-feed .ftime').forEach(c=>c.classList.remove('active'));
+    $('feed-cal-chip').textContent=lbl; $('feed-cal-chip').classList.add('active');
+    closeCal();buildFeedTimeline();return;
+  }
+  calSelectedDate=ds;timeFilter='day:'+ds;
+  document.querySelectorAll('#tab-explore .filter-bar .chip').forEach(c=>c.classList.remove('active'));
+  $('cal-chip').textContent=lbl; $('cal-chip').classList.add('active');
   closeCal();buildAll();
 }
 function clearCal(){
   calSelectedDate=null;$('cal-chip').textContent='📅 Date';closeCal();
-  const chips=document.querySelectorAll('.filter-bar .chip');
+  const chips=document.querySelectorAll('#tab-explore .filter-bar .chip');
   chips.forEach(c=>c.classList.remove('active'));
   chips[2].classList.add('active');// 24h default
   timeFilter='24h';buildAll();
@@ -1522,16 +1652,17 @@ async function init(){
   historyPromise=null;nextToken=null;allDetections=[];
   setStatus('','Connecting…');
   try{
-    await Promise.all([loadEbirdCurrentMonth(),fetchRecent(),loadReviewCount()]);
+    await Promise.all([loadEbirdCurrentMonth(),fetchRecent(),loadReviewCount(),loadSightings()]);
     $('loading').style.display='none';
     $('app').style.display='block';
-    buildAll();   // Audio is the default tab; Sightings/Live load on first open
+    buildFeedTimeline();   // Feed is the default tab; Explore/Sightings/Live build on first open
     setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} recent`);
     // Load history in background
     setTimeout(()=>{
       ensureHistory().then(()=>{
         setStatus('live',`${fmtTime(new Date())} · ${allDetections.length} detections`);
-        if(['week','month','year','all'].includes(timeFilter)||calSelectedDate)buildAll();
+        if(activeTab==='feed')buildFeedTimeline();
+        else if(activeTab==='explore'&&(['week','month','year','all'].includes(timeFilter)||calSelectedDate))buildAll();
       });
     },600);
     scheduleAutoRefresh();
