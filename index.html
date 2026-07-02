@@ -464,10 +464,9 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
       <div class="hourly-chart" id="hourly-chart"></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">Top Species</div>
+      <div class="chart-title">Species</div>
       <div id="top-sp"></div>
     </div>
-    <div class="sp-list-wrap" id="sp-list"></div>
   </div>
 
   <!-- LIVE — MJPEG camera stream -->
@@ -833,7 +832,7 @@ function buildAll(){
   const f=filteredDets();
   buildHero();
   buildBotd(f);
-  buildHourly(f); buildTopSp(f); buildSpeciesList(f);
+  buildHourly(f); buildTopSp(f);
 }
 
 // === HERO ===
@@ -1043,7 +1042,7 @@ function selectDay(iso){
 // === TOP SPECIES (ranked list) ===
 function buildTopSp(f){
   const map={};f.forEach(d=>map[d.cn]=(map[d.cn]||0)+1);
-  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);   // all species in this timeframe
   $('top-sp').innerHTML=sorted.length?sorted.map(([name,cnt],i)=>`
     <div class="top-sp-row" onclick="openSpecies('${name.replace(/'/g,"\\'")}')">
       <span class="top-sp-rank">${i+1}</span>
