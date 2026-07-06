@@ -473,7 +473,10 @@ footer{text-align:center;padding:22px;font-size:0.58rem;color:rgba(26,26,20,.3);
   <div class="tab-pane" id="tab-live">
     <div class="live-head">
       <span>🔴 Live at the feeder <span class="live-auto">· auto-refreshing</span></span>
-      <a class="live-open" href="https://stream.pamtexbirdstationstreams.com/" target="_blank" rel="noopener">⛶ Fullscreen ↗</a>
+      <span style="display:flex;gap:8px">
+        <button class="live-open" style="border:none;cursor:pointer" onclick="startLiveStream()">⟳ Reconnect</button>
+        <a class="live-open" href="https://stream.pamtexbirdstationstreams.com/" target="_blank" rel="noopener">⛶ Fullscreen ↗</a>
+      </span>
     </div>
     <style>.live-player.offline #live-stream{display:none}.live-player.offline .live-offline{display:flex!important}</style>
     <div class="live-player" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;margin-bottom:14px">
